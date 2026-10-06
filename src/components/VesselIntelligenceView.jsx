@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { VESSELS, FLEET_TRUCKS } from '../data/mockData';
 import { Ship, Compass, Clock, Navigation, Anchor, Truck, Package, ArrowRight, ShieldCheck, AlertTriangle, Filter } from 'lucide-react';
 
-export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor }) {
+export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor, activeRole = 'all' }) {
   const [selectedVesselId, setSelectedVesselId] = useState('VES-9481');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
 
@@ -14,15 +14,20 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor }) {
   const activeVessel = VESSELS.find(v => v.id === selectedVesselId) || VESSELS[0];
 
   return (
-    <div className="bg-white border border-[#CBD5E1] rounded shadow-xs p-4 flex flex-col h-full overflow-y-auto font-mono text-xs">
+    <div className="bg-white border border-[#CBD5E1] rounded shadow-xs p-3 sm:p-4 flex flex-col h-full overflow-y-auto font-mono text-xs">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-[#E2E8F0] gap-3">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Ship className="w-5 h-5 text-[#0D3B66]" />
-            <h2 className="text-base font-bold text-[#0F172A]">
+            <h2 className="text-sm sm:text-base font-bold text-[#0F172A]">
               AIS VESSEL TRAFFIC & SEA-TO-BERTH INTELLIGENCE
             </h2>
+            {activeRole === 'port' && (
+              <span className="px-2 py-0.5 text-[10px] font-bold bg-[#EFF6FF] text-[#1E40AF] rounded border border-[#BFDBFE]">
+                HARBOUR PILOT QUEUE
+              </span>
+            )}
           </div>
           <p className="text-xs text-[#64748B] mt-0.5">
             Real-time Bay of Bengal ship positions, nautical draft, speed over ground (SOG), and berth arrival models
@@ -30,14 +35,14 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor }) {
         </div>
 
         {/* Category Filter */}
-        <div className="flex items-center gap-1 overflow-x-auto">
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
           {['ALL', 'Container', 'Tanker', 'Gas Carrier', 'Bulk Carrier', 'Reefer'].map(cat => (
             <button
               key={cat}
               onClick={() => setCategoryFilter(cat)}
-              className={`px-2 py-1 rounded text-[11px] font-semibold transition-colors ${
+              className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap transition-colors ${
                 categoryFilter === cat
-                  ? 'bg-[#0D3B66] text-white'
+                  ? 'bg-[#0D3B66] text-white shadow-xs'
                   : 'bg-[#F1F5F9] text-[#475569] hover:bg-[#E2E8F0]'
               }`}
             >
@@ -52,10 +57,13 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor }) {
         {filteredVessels.map(v => (
           <button
             key={v.id}
-            onClick={() => setSelectedVesselId(v.id)}
-            className={`px-3 py-2 rounded border text-left transition-all shrink-0 min-w-[170px] ${
+            onClick={() => {
+              setSelectedVesselId(v.id);
+              if (onSelectAsset) onSelectAsset({ ...v, assetType: 'vessel' });
+            }}
+            className={`px-3 py-2 rounded-lg border text-left transition-all shrink-0 min-w-[160px] sm:min-w-[175px] ${
               selectedVesselId === v.id
-                ? 'bg-[#F0F7FF] border-[#0D3B66] ring-1 ring-[#0D3B66] shadow-xs'
+                ? 'bg-[#F0F7FF] border-[#0D3B66] ring-2 ring-[#0D3B66] shadow-xs'
                 : 'bg-[#F8F9FA] hover:bg-white border-[#CBD5E1]'
             }`}
           >
@@ -77,8 +85,8 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor }) {
       <div className="my-2 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start flex-1">
         {/* Left: Vessel Telemetry & Operations Spec */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-[#F8F9FA] border border-[#CBD5E1] rounded p-4 font-mono">
-            <div className="flex items-start justify-between pb-3 border-b border-[#E2E8F0]">
+          <div className="bg-[#F8F9FA] border border-[#CBD5E1] rounded-lg p-3.5 sm:p-4">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between pb-3 border-b border-[#E2E8F0] gap-1">
               <div>
                 <span className="text-[10px] text-[#64748B] uppercase">AIS OPERATIONS RECORD</span>
                 <div className="text-base font-bold text-[#0F172A]">{activeVessel.name}</div>
@@ -86,7 +94,7 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor }) {
                   {activeVessel.imo} • MMSI: {activeVessel.mmsi} • Call Sign: {activeVessel.callSign}
                 </div>
               </div>
-              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+              <span className={`px-2 py-0.5 rounded text-[10px] font-bold self-start sm:self-auto ${
                 activeVessel.status === 'delayed' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-green-100 text-green-800'
               }`}>
                 {activeVessel.statusDetail || activeVessel.status.toUpperCase()}
@@ -94,7 +102,7 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor }) {
             </div>
 
             {/* Spec Matrix */}
-            <div className="grid grid-cols-2 gap-3 mt-3 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 text-xs">
               <div>
                 <div className="text-[10px] text-[#64748B]">VESSEL CLASS</div>
                 <div className="font-semibold text-[#0F172A] mt-0.5">{activeVessel.type}</div>
@@ -145,7 +153,7 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor }) {
           </div>
 
           {/* Connected Cargo Manifest */}
-          <div className="p-3 bg-white border border-[#CBD5E1] rounded font-mono text-xs">
+          <div className="p-3 bg-white border border-[#CBD5E1] rounded-lg text-xs">
             <div className="text-[10px] text-[#64748B] font-bold uppercase mb-2">
               KEY HIGH-VALUE / SENSITIVE CARGO
             </div>
@@ -164,7 +172,7 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor }) {
 
         {/* Right: Sequential Journey Timeline */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="bg-[#F8F9FA] border border-[#CBD5E1] rounded p-4 font-mono">
+          <div className="bg-[#F8F9FA] border border-[#CBD5E1] rounded-lg p-3.5 sm:p-4">
             <div className="text-xs font-bold text-[#0F172A] mb-3 pb-2 border-b border-[#E2E8F0]">
               SEA ➔ PORT ➔ CARGO ➔ LAND ROUTE TIMELINE
             </div>
@@ -177,7 +185,7 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor }) {
                   }`} />
 
                   <div>
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-0.5">
                       <span className={`font-bold ${step.current ? 'text-[#0D3B66]' : 'text-[#0F172A]'}`}>
                         {step.step}
                       </span>
@@ -200,7 +208,7 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor }) {
                   <Truck className="w-3.5 h-3.5 text-[#0D3B66]" />
                   <span>ASSIGNED LAND CORRIDOR HAULAGE:</span>
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
                   {activeVessel.connectedTrucks.map(tk => (
                     <div key={tk} className="p-2 bg-white border border-[#CBD5E1] rounded text-center">
                       <div className="font-bold text-[#0F172A]">{tk}</div>

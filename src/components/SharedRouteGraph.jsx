@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SHARED_CORRIDOR_GRAPH, PORTS, VESSELS, FLEET_TRUCKS, WAREHOUSES } from '../data/mockData';
 import { Ship, Anchor, Truck, Building2, ArrowRight, ArrowDown, AlertTriangle, CheckCircle, Clock, Zap, Layers, Sparkles } from 'lucide-react';
 
-export function SharedRouteGraph({ onSelectAsset, onTriggerImpactView, isCompact = false }) {
+export function SharedRouteGraph({ onSelectAsset, onTriggerImpactView, isCompact = false, activeRole = 'all' }) {
   const [selectedNodeIndex, setSelectedNodeIndex] = useState(1); // Default to Visakhapatnam port
 
   const nodes = [
@@ -140,15 +140,18 @@ export function SharedRouteGraph({ onSelectAsset, onTriggerImpactView, isCompact
 
   // Full Screen Spacious Multi-Modal View
   return (
-    <div className="bg-white border border-[#CBD5E1] rounded shadow-xs p-4 sm:p-5 flex flex-col h-full overflow-y-auto font-mono text-xs">
+    <div className="bg-white border border-[#CBD5E1] rounded shadow-xs p-3 sm:p-5 flex flex-col h-full overflow-y-auto font-mono text-xs">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-[#E2E8F0] gap-3">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Layers className="w-5 h-5 text-[#0D3B66]" />
-            <h2 className="text-base font-bold text-[#0F172A]">
+            <h2 className="text-sm sm:text-base font-bold text-[#0F172A]">
               SHARED ROUTE GRAPH • MULTI-MODAL FREIGHT PIPELINE
             </h2>
+            <span className="px-2 py-0.5 text-[10px] font-bold bg-[#F1F5F9] text-[#475569] border border-[#CBD5E1] rounded">
+              VIZAG ➔ HYDERABAD CORRIDOR
+            </span>
           </div>
           <p className="text-xs text-[#64748B] mt-0.5">
             Single deterministic corridor connecting Sea Passage ➔ Port Terminal ➔ Highway Haulage ➔ Warehouse Door
@@ -157,15 +160,15 @@ export function SharedRouteGraph({ onSelectAsset, onTriggerImpactView, isCompact
 
         <button
           onClick={onTriggerImpactView}
-          className="flex items-center gap-2 px-3.5 py-2 bg-[#0D3B66] hover:bg-[#0A2E50] text-white text-xs font-bold rounded transition-colors shadow-xs shrink-0"
+          className="flex items-center gap-2 px-3.5 py-2 bg-[#0D3B66] hover:bg-[#0A2E50] text-white text-xs font-bold rounded transition-colors shadow-xs shrink-0 self-start md:self-auto"
         >
           <Zap className="w-4 h-4 text-amber-300" />
           <span>SIMULATE BOTTLENECK CASCADE</span>
         </button>
       </div>
 
-      {/* Horizontal Multi-Modal Pipeline Cards (Spacious Flow) */}
-      <div className="my-5">
+      {/* Horizontal Multi-Modal Pipeline Cards */}
+      <div className="my-4 sm:my-5">
         <div className="text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-3">
           CORRIDOR NODE SEQUENCE (CLICK ANY NODE TO INSPECT TELEMETRY & CARGO)
         </div>
@@ -174,7 +177,6 @@ export function SharedRouteGraph({ onSelectAsset, onTriggerImpactView, isCompact
           {nodes.map((node, index) => {
             const Icon = node.icon;
             const isSelected = selectedNodeIndex === index;
-            const isLast = index === nodes.length - 1;
 
             return (
               <div
@@ -183,7 +185,7 @@ export function SharedRouteGraph({ onSelectAsset, onTriggerImpactView, isCompact
                   setSelectedNodeIndex(index);
                   if (onSelectAsset) onSelectAsset({ ...node.data, assetType: node.entityType });
                 }}
-                className={`p-4 rounded border transition-all cursor-pointer flex flex-col justify-between relative ${
+                className={`p-3.5 sm:p-4 rounded-lg border transition-all cursor-pointer flex flex-col justify-between ${
                   isSelected
                     ? 'bg-[#F0F7FF] border-[#0D3B66] ring-2 ring-[#0D3B66] shadow-sm'
                     : 'bg-[#F8F9FA] hover:bg-white border-[#CBD5E1]'
@@ -211,7 +213,7 @@ export function SharedRouteGraph({ onSelectAsset, onTriggerImpactView, isCompact
                   </div>
 
                   {/* Node Title & Subtitle */}
-                  <div className="font-bold text-[#0F172A] text-sm mt-1">
+                  <div className="font-bold text-[#0F172A] text-xs sm:text-sm mt-1">
                     {node.title}
                   </div>
                   <div className="text-[11px] text-[#64748B] mt-0.5">
@@ -238,8 +240,8 @@ export function SharedRouteGraph({ onSelectAsset, onTriggerImpactView, isCompact
         </div>
       </div>
 
-      {/* Synchronized Node Inspector Canvas (Full Width & Ample Breathing Room) */}
-      <div className="mt-2 bg-[#F8F9FA] border border-[#CBD5E1] rounded p-4 flex-1">
+      {/* Synchronized Node Inspector Canvas */}
+      <div className="mt-2 bg-[#F8F9FA] border border-[#CBD5E1] rounded-lg p-3.5 sm:p-4 flex-1">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#E2E8F0] gap-2">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#0D3B66]"></span>
@@ -248,44 +250,28 @@ export function SharedRouteGraph({ onSelectAsset, onTriggerImpactView, isCompact
             </span>
           </div>
 
-          <button
-            onClick={() => onSelectAsset && onSelectAsset({ ...activeNode.data, assetType: activeNode.entityType })}
-            className="px-3 py-1 bg-[#0D3B66] hover:bg-[#0A2E50] text-white rounded text-xs font-bold transition-colors shadow-xs"
-          >
-            OPEN FULL RECORD ➔
-          </button>
+          <span className="text-[11px] text-[#475569] font-bold">
+            Target: {activeNode.title}
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-xs">
-          {/* Box 1: Entity Spec */}
-          <div className="p-3.5 bg-white border border-[#CBD5E1] rounded space-y-2">
-            <div className="text-[10px] text-[#64748B] uppercase font-bold">SELECTED ENTITY</div>
-            <div className="font-bold text-[#0F172A] text-sm">{activeNode.title}</div>
-            <div className="text-[11px] text-[#475569]">{activeNode.sub}</div>
-            <div className="pt-2 border-t border-[#F1F5F9] text-[11px]">
-              <span className="text-[#64748B]">Operational State: </span>
-              <span className="font-bold text-[#0D3B66]">{activeNode.status}</span>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+          <div className="p-3 bg-white border border-[#E2E8F0] rounded">
+            <div className="text-[10px] text-[#64748B] uppercase">STATUS & DWELL</div>
+            <div className="font-bold text-[#0F172A] mt-0.5">{activeNode.status}</div>
+            <div className="text-[11px] text-[#0D3B66] mt-1">{activeNode.dwell}</div>
           </div>
 
-          {/* Box 2: Cargo Consignment */}
-          <div className="p-3.5 bg-white border border-[#CBD5E1] rounded space-y-2">
-            <div className="text-[10px] text-[#64748B] uppercase font-bold">CARGO CONSIGNMENT</div>
-            <div className="font-bold text-[#0F172A]">{activeNode.cargo}</div>
-            <div className="text-[11px] text-[#475569]">
-              Multi-modal tracking active across Bay of Bengal sea lane and NH-65 highway corridor.
-            </div>
+          <div className="p-3 bg-white border border-[#E2E8F0] rounded">
+            <div className="text-[10px] text-[#64748B] uppercase">CARGO PAYLOAD</div>
+            <div className="font-bold text-[#0F172A] mt-0.5">{activeNode.cargo}</div>
+            <div className="text-[11px] text-[#059669] mt-1">Direct Custody Link</div>
           </div>
 
-          {/* Box 3: Corridor Rationale */}
-          <div className="p-3.5 bg-[#EFF6FF] border border-[#BFDBFE] rounded space-y-1.5 text-[#1E40AF]">
-            <div className="text-[10px] uppercase font-bold flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-[#2563EB]" />
-              CORRIDOR INTELLIGENCE RATIONALE
-            </div>
-            <div className="text-[11px] leading-relaxed">
-              Because Sea, Port, Road, and Warehouse share the same route graph, port berth delays immediately trigger backhaul rescheduling and cold-chain thermal alarms before truck arrival.
-            </div>
+          <div className="p-3 bg-white border border-[#E2E8F0] rounded">
+            <div className="text-[10px] text-[#64748B] uppercase">UPSTREAM/DOWNSTREAM COUPLING</div>
+            <div className="font-bold text-[#0F172A] mt-0.5">Automated Rescheduling</div>
+            <div className="text-[11px] text-[#64748B] mt-1">Zero Blind Delays</div>
           </div>
         </div>
       </div>

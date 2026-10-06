@@ -14,16 +14,17 @@ import {
   Clock,
   AlertTriangle,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react';
 
 export const ALL_NAV_ITEMS = [
   { id: 'overview', label: 'Command Center', icon: LayoutDashboard, category: 'CORE' },
-  { id: 'shipments', label: 'My Shipments & Cargo', icon: Package, category: 'CARGO OWNER', badge: '4 ACTIVE', highlight: true },
+  { id: 'shipments', label: 'My Shipments & Cargo', icon: Package, category: 'CARGO OWNER', badge: '4 UNITS', highlight: true },
   { id: 'graph', label: 'Shared Route Graph', icon: GitFork, category: 'CORE', badge: 'CORRIDOR' },
   { id: 'ports', label: 'Port Intelligence', icon: Anchor, category: 'SEA & HARBOUR', alert: '81% PEAK' },
-  { id: 'vessels', label: 'Vessel Timing', icon: Ship, category: 'SEA & HARBOUR' },
-  { id: 'fleet', label: 'Fleet & Haulage', icon: Truck, category: 'LAND NETWORK' },
+  { id: 'vessels', label: 'AIS Vessel Timing', icon: Ship, category: 'SEA & HARBOUR' },
+  { id: 'fleet', label: 'Fleet Dispatch & Rigs', icon: Truck, category: 'LAND NETWORK' },
   { id: 'backhaul', label: 'Backhaul Matching', icon: Repeat, category: 'LAND NETWORK', badge: '11 MATCH' },
   { id: 'coldchain', label: 'Cold-Chain Surveillance', icon: ThermometerSnowflake, category: 'CARGO', alert: '1 CRITICAL' },
   { id: 'impact', label: 'Network Impact Demo', icon: Activity, category: 'SIGNATURE' },
@@ -32,16 +33,17 @@ export const ALL_NAV_ITEMS = [
 ];
 
 export function Navigation({ activeTab, setActiveTab, activeRole = 'all' }) {
-  // Filter nav items based on user role
+  // Filter nav items dynamically based on user role
   let visibleNavItems = ALL_NAV_ITEMS;
 
   if (activeRole === 'cargo_owner') {
     visibleNavItems = [
-      { id: 'shipments', label: 'My Shipments (Track)', icon: Package, highlight: true, badge: '4 UNITS' },
+      { id: 'shipments', label: 'My Shipments & Cargo', icon: Package, highlight: true, badge: '4 UNITS' },
       { id: 'overview', label: 'Corridor GIS Map', icon: LayoutDashboard },
       { id: 'graph', label: 'Sea-to-Door Route Graph', icon: GitFork },
       { id: 'coldchain', label: 'Reefer Sensor Telemetry', icon: ThermometerSnowflake, alert: '1 RISK' },
-      { id: 'alerts', label: 'My Consignment Alerts', icon: AlertTriangle, alert: '2 EXCEPTIONS' }
+      { id: 'alerts', label: 'My Consignment Alerts', icon: AlertTriangle, alert: '2 DELAYS' },
+      { id: 'analytics', label: 'Cargo SLA Analytics', icon: BarChart3 }
     ];
   } else if (activeRole === 'port') {
     visibleNavItems = [
@@ -50,7 +52,8 @@ export function Navigation({ activeTab, setActiveTab, activeRole = 'all' }) {
       { id: 'overview', label: 'Harbour GIS Map', icon: LayoutDashboard },
       { id: 'graph', label: 'Downstream Corridor Graph', icon: GitFork },
       { id: 'impact', label: 'Port Bottleneck Impact', icon: Activity },
-      { id: 'alerts', label: 'Port Alerts', icon: Bell }
+      { id: 'alerts', label: 'Port Alerts & Pilot Queue', icon: Bell, alert: '1 ALERT' },
+      { id: 'analytics', label: 'Port Throughput Analytics', icon: BarChart3 }
     ];
   } else if (activeRole === 'fleet') {
     visibleNavItems = [
@@ -58,7 +61,8 @@ export function Navigation({ activeTab, setActiveTab, activeRole = 'all' }) {
       { id: 'backhaul', label: 'Backhaul Matching Engine', icon: Repeat, badge: '11 MATCH' },
       { id: 'overview', label: 'Highway Fleet Map', icon: LayoutDashboard },
       { id: 'graph', label: 'Corridor Route Graph', icon: GitFork },
-      { id: 'alerts', label: 'Fleet Alerts', icon: Bell }
+      { id: 'alerts', label: 'Fleet & Gate Alerts', icon: Bell },
+      { id: 'analytics', label: 'Deadhead Elimination Analytics', icon: BarChart3 }
     ];
   } else if (activeRole === 'coldchain') {
     visibleNavItems = [
@@ -66,19 +70,32 @@ export function Navigation({ activeTab, setActiveTab, activeRole = 'all' }) {
       { id: 'shipments', label: 'Pharma & Food Shipments', icon: Package },
       { id: 'overview', label: 'Corridor Map', icon: LayoutDashboard },
       { id: 'graph', label: 'Shared Route Graph', icon: GitFork },
-      { id: 'alerts', label: 'Excursion Alerts', icon: AlertTriangle, alert: 'CRITICAL' }
+      { id: 'alerts', label: 'Excursion Alerts', icon: AlertTriangle, alert: 'CRITICAL' },
+      { id: 'analytics', label: 'Thermal Stability Analytics', icon: BarChart3 }
     ];
   }
+
+  const roleBadgeColors = {
+    all: 'bg-[#0D3B66] text-white',
+    cargo_owner: 'bg-[#0284C7] text-white',
+    port: 'bg-[#DC2626] text-white',
+    fleet: 'bg-[#059669] text-white',
+    coldchain: 'bg-[#086788] text-white'
+  };
 
   return (
     <>
       {/* Desktop & Laptop Sidebar */}
-      <aside className="hidden md:flex flex-col w-60 xl:w-64 bg-white border-r border-[#E2E8F0] shrink-0 h-full overflow-y-auto select-none font-mono">
+      <aside className="hidden md:flex flex-col w-56 xl:w-64 bg-white border-r border-[#E2E8F0] shrink-0 h-full overflow-y-auto select-none font-mono">
         <div className="p-3 border-b border-[#F1F5F9] flex items-center justify-between">
-          <span className="text-[10px] uppercase tracking-wider text-[#94A3B8] font-bold px-1">
-            {activeRole === 'cargo_owner' ? 'CARGO OWNER PORTAL' : 'WORKSPACE NAVIGATION'}
+          <span className="text-[10px] uppercase tracking-wider text-[#94A3B8] font-bold px-1 truncate">
+            {activeRole === 'cargo_owner' ? 'IMPORTER WORKSPACE' : 
+             activeRole === 'port' ? 'PORT OPS WORKSPACE' : 
+             activeRole === 'fleet' ? 'FLEET DISPATCH WORKSPACE' : 
+             activeRole === 'coldchain' ? 'COLD REEFER WORKSPACE' : 
+             'CONTROL TOWER'}
           </span>
-          <span className="text-[9px] px-1.5 py-0.2 bg-[#F1F5F9] text-[#64748B] rounded border border-[#CBD5E1]">
+          <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold ${roleBadgeColors[activeRole] || 'bg-[#F1F5F9] text-[#64748B]'}`}>
             {activeRole.toUpperCase()}
           </span>
         </div>
@@ -91,7 +108,7 @@ export function Navigation({ activeTab, setActiveTab, activeRole = 'all' }) {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded text-xs font-medium transition-all text-left ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium transition-all text-left cursor-pointer ${
                   isActive
                     ? 'bg-[#0D3B66] text-white shadow-xs font-bold'
                     : 'text-[#334155] hover:bg-[#F1F5F9] hover:text-[#0F172A]'
@@ -104,14 +121,14 @@ export function Navigation({ activeTab, setActiveTab, activeRole = 'all' }) {
 
                 <div className="flex items-center gap-1.5 shrink-0 ml-1">
                   {item.alert && (
-                    <span className={`text-[9px] px-1 py-0.2 rounded font-bold ${
+                    <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold ${
                       isActive ? 'bg-red-500 text-white' : 'bg-red-100 text-red-700'
                     }`}>
                       {item.alert}
                     </span>
                   )}
                   {item.badge && !item.alert && (
-                    <span className={`text-[9px] px-1 py-0.2 rounded font-semibold ${
+                    <span className={`text-[9px] px-1.5 py-0.2 rounded font-semibold ${
                       isActive ? 'bg-white/20 text-white' : 'bg-[#E2E8F0] text-[#475569]'
                     }`}>
                       {item.badge}
@@ -125,19 +142,23 @@ export function Navigation({ activeTab, setActiveTab, activeRole = 'all' }) {
         </nav>
 
         {/* Role Status Indicator in Sidebar */}
-        <div className="p-3 m-2 bg-[#F8F9FA] border border-[#E2E8F0] rounded text-[11px] text-[#64748B]">
+        <div className="p-3 m-2 bg-[#F8F9FA] border border-[#E2E8F0] rounded-lg text-[11px] text-[#64748B]">
           <div className="flex items-center justify-between text-[#0F172A] font-semibold mb-1">
             <span>{activeRole === 'cargo_owner' ? 'IMPORTER PROFILE' : 'CORRIDOR GRAPH'}</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#059669]"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#059669] animate-ping"></span>
           </div>
           <div className="text-[10px] leading-tight text-[#475569]">
-            {activeRole === 'cargo_owner' ? '4 Consignments Synchronized' : 'SEA ➔ PORT ➔ LAND ➔ WAREHOUSE'}
+            {activeRole === 'cargo_owner' ? '4 Consignments Synchronized' : 
+             activeRole === 'port' ? 'Visakhapatnam Berth 02-06' :
+             activeRole === 'fleet' ? '184 Rigs / 11 Matches' :
+             activeRole === 'coldchain' ? '4 Reefer Curves Monitored' :
+             'SEA ➔ PORT ➔ LAND ➔ WAREHOUSE'}
           </div>
         </div>
       </aside>
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E2E8F0] px-2 py-1.5 flex items-center justify-around z-40 font-mono">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#CBD5E1] px-1 py-1.5 flex items-center justify-around z-40 font-mono shadow-lg">
         {visibleNavItems.slice(0, 5).map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -145,12 +166,15 @@ export function Navigation({ activeTab, setActiveTab, activeRole = 'all' }) {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded text-[10px] font-medium transition-colors ${
+              className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded text-[9.5px] font-medium transition-colors relative ${
                 isActive ? 'text-[#0D3B66] font-bold' : 'text-[#64748B]'
               }`}
             >
               <Icon className={`w-4 h-4 ${isActive ? 'text-[#0D3B66]' : 'text-[#94A3B8]'}`} />
-              <span className="truncate max-w-[64px]">{item.label.split(' ')[0]}</span>
+              <span className="truncate max-w-[62px]">{item.label.split(' ')[0]}</span>
+              {item.alert && (
+                <span className="absolute top-0.5 right-1 w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+              )}
             </button>
           );
         })}

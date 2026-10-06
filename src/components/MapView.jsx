@@ -17,10 +17,15 @@ import {
   Ship,
   Navigation,
   Anchor,
-  Filter
+  Filter,
+  Truck,
+  Building2,
+  Package,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
-export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
+export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, activeRole = 'all' }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const currentTileLayerRef = useRef(null);
@@ -39,6 +44,7 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
   const [simTick, setSimTick] = useState(0);
   const [cursorCoords, setCursorCoords] = useState({ lat: 17.6868, lng: 83.2185 });
   const [vesselTypeFilter, setVesselTypeFilter] = useState('ALL');
+  const [isLayersPanelOpen, setIsLayersPanelOpen] = useState(false);
   const [activeLayerFilters, setActiveLayerFilters] = useState({
     ports: true,
     vessels: true,
@@ -88,7 +94,16 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
     currentTileLayerRef.current = tileLayer;
     mapInstanceRef.current = map;
 
+    // Trigger map invalidation on window resize for responsive canvas
+    const handleResize = () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+
     return () => {
+      window.removeEventListener('resize', handleResize);
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -176,7 +191,7 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
     if (activeLayerFilters.shippingTrunks) {
       const trunkGroup = L.layerGroup();
 
-      // East-West Global Trunk Line (Malacca to Sri Lanka / Suez)
+      // East-West Global Trunk Line
       L.polyline(CORRIDOR_POLYLINES.sea_trunk_malacca_srilanka, {
         color: isDark ? '#A78BFA' : '#7C3AED',
         weight: 3,
@@ -328,7 +343,7 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
       layersRef.current.ports = portGroup;
     }
 
-    // 5. Dense Vessel Fleet AIS Markers (with Category Colors & Heading Vectors)
+    // 5. Dense Vessel Fleet AIS Markers
     if (activeLayerFilters.vessels) {
       const vesselGroup = L.layerGroup();
 
@@ -348,28 +363,14 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
         const currentLng = vessel.lng + lngOffset;
 
         // Color coding by vessel category
-        let color = '#0284C7'; // Container
-        let iconSymbol = '🚢';
-        if (vessel.category === 'Tanker') {
-          color = '#E11D48';
-          iconSymbol = '🛢️';
-        } else if (vessel.category === 'Gas Carrier') {
-          color = '#8B5CF6';
-          iconSymbol = '⚡';
-        } else if (vessel.category === 'Bulk Carrier') {
-          color = '#D97706';
-          iconSymbol = '🏗️';
-        } else if (vessel.category === 'Harbour Craft') {
-          color = '#059669';
-          iconSymbol = '⚓';
-        } else if (vessel.category === 'Reefer') {
-          color = '#06B6D4';
-          iconSymbol = '❄️';
-        }
+        let color = '#0284C7';
+        if (vessel.category === 'Tanker') color = '#E11D48';
+        else if (vessel.category === 'Gas Carrier') color = '#8B5CF6';
+        else if (vessel.category === 'Bulk Carrier') color = '#D97706';
+        else if (vessel.category === 'Harbour Craft') color = '#059669';
+        else if (vessel.category === 'Reefer') color = '#06B6D4';
 
-        if (isDelayed) {
-          color = '#EF4444';
-        }
+        if (isDelayed) color = '#EF4444';
 
         const vesselIcon = L.divIcon({
           className: 'realistic-vessel-marker',
@@ -404,7 +405,6 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
         const marker = L.marker([currentLat, currentLng], { icon: vesselIcon })
           .on('click', () => onSelectAsset && onSelectAsset({ ...vessel, assetType: 'vessel' }));
 
-        // Bind interactive rich tooltip
         marker.bindTooltip(`
           <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; line-height: 1.4;">
             <strong style="color:${color}; font-size:11px;">${vessel.name}</strong> (${vessel.imo})<br/>
@@ -523,10 +523,10 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
       <div ref={mapContainerRef} className="w-full h-full" />
 
       {/* Top Left: GIS Basemap Mode Switcher */}
-      <div className="absolute top-3 left-3 z-[400] flex items-center gap-1 bg-[#0F172A]/90 backdrop-blur-md p-1 rounded border border-[#334155] shadow-lg text-xs">
+      <div className="absolute top-2 sm:top-3 left-2 sm:left-3 z-[400] flex items-center gap-1 bg-[#0F172A]/90 backdrop-blur-md p-1 rounded border border-[#334155] shadow-lg text-[10px] sm:text-xs">
         <button
           onClick={() => setActiveBasemap('nautical_dark')}
-          className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${
+          className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded transition-colors ${
             activeBasemap === 'nautical_dark' 
               ? 'bg-[#0284C7] text-white font-bold' 
               : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]'
@@ -534,12 +534,12 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
           title="Nautical Dark (AIS Radar Mode)"
         >
           <Moon className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">NAUTICAL RADAR</span>
+          <span className="hidden md:inline">NAUTICAL RADAR</span>
         </button>
 
         <button
           onClick={() => setActiveBasemap('satellite_hybrid')}
-          className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${
+          className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded transition-colors ${
             activeBasemap === 'satellite_hybrid' 
               ? 'bg-[#0284C7] text-white font-bold' 
               : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]'
@@ -547,12 +547,12 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
           title="Satellite Coastal Hybrid Imagery"
         >
           <Satellite className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">SATELLITE</span>
+          <span className="hidden md:inline">SATELLITE</span>
         </button>
 
         <button
           onClick={() => setActiveBasemap('carto_light')}
-          className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${
+          className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded transition-colors ${
             activeBasemap === 'carto_light' 
               ? 'bg-[#0284C7] text-white font-bold' 
               : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]'
@@ -560,22 +560,22 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
           title="Industrial Paper Chart Style"
         >
           <Sun className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">CHARTS</span>
+          <span className="hidden md:inline">CHARTS</span>
         </button>
       </div>
 
-      {/* Top Center: Vessel Type Quick Filter Chips */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[400] hidden lg:flex items-center gap-1 bg-[#0F172A]/90 backdrop-blur-md px-2 py-1 rounded border border-[#334155] shadow-lg text-[10px] text-white">
+      {/* Top Center: Vessel Type Quick Filter Chips (Desktop) */}
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[400] hidden lg:flex items-center gap-1 bg-[#0F172A]/90 backdrop-blur-md px-2.5 py-1 rounded border border-[#334155] shadow-lg text-[10px] text-white">
         <span className="text-[#94A3B8] font-bold mr-1 flex items-center gap-1">
           <Filter className="w-3 h-3 text-[#38BDF8]" /> AIS FLEET:
         </span>
         {[
           { id: 'ALL', label: 'All Ships (10)' },
-          { id: 'Container', label: 'Container (4)', color: 'text-[#38BDF8]' },
-          { id: 'Tanker', label: 'Tankers (1)', color: 'text-[#FB7185]' },
-          { id: 'Gas Carrier', label: 'LNG/Gas (1)', color: 'text-[#A78BFA]' },
-          { id: 'Bulk Carrier', label: 'Bulk Ore (1)', color: 'text-[#FBBF24]' },
-          { id: 'Reefer', label: 'Reefer (1)', color: 'text-[#67E8F9]' }
+          { id: 'Container', label: 'Container (4)' },
+          { id: 'Tanker', label: 'Tankers (1)' },
+          { id: 'Gas Carrier', label: 'LNG/Gas (1)' },
+          { id: 'Bulk Carrier', label: 'Bulk (1)' },
+          { id: 'Reefer', label: 'Reefer (1)' }
         ].map(cat => (
           <button
             key={cat.id}
@@ -591,14 +591,14 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
         ))}
       </div>
 
-      {/* Top Right: Layer Visibility & Simulation Toggle */}
-      <div className="absolute top-3 right-3 z-[400] flex flex-col gap-2">
+      {/* Top Right: Layer Visibility & Simulation Controls */}
+      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 z-[400] flex flex-col gap-1.5 sm:gap-2">
         {/* Live AIS Telemetry Stream Control */}
-        <div className="bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded p-2 text-xs text-[#F8FAFC] shadow-lg flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+        <div className="bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded p-1.5 sm:p-2 text-xs text-[#F8FAFC] shadow-lg flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
             <span className={`w-2 h-2 rounded-full ${isSimulating ? 'bg-[#10B981] animate-ping' : 'bg-[#64748B]'}`}></span>
-            <span className="text-[11px] font-bold">
-              {isSimulating ? 'LIVE AIS SIMULATION' : 'SIMULATION PAUSED'}
+            <span className="text-[10px] sm:text-[11px] font-bold hidden sm:inline">
+              {isSimulating ? 'LIVE AIS SIM' : 'SIM PAUSED'}
             </span>
           </div>
 
@@ -611,27 +611,38 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
           </button>
         </div>
 
-        {/* Layer Filters Box */}
-        <div className="bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded shadow-lg p-2.5 text-xs text-[#F8FAFC]">
+        {/* Mobile Layers Toggle Button */}
+        <button
+          onClick={() => setIsLayersPanelOpen(!isLayersPanelOpen)}
+          className="md:hidden bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded p-1.5 text-[#38BDF8] flex items-center justify-center self-end shadow-md"
+          title="Toggle Layer Filters"
+        >
+          <Layers className="w-4 h-4" />
+        </button>
+
+        {/* Layer Filters Box (Desktop or Expanded on Mobile) */}
+        <div className={`bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded shadow-lg p-2 sm:p-2.5 text-xs text-[#F8FAFC] ${
+          isLayersPanelOpen ? 'block' : 'hidden md:block'
+        }`}>
           <div className="text-[10px] text-[#94A3B8] font-bold uppercase mb-1.5 flex items-center justify-between">
             <span className="flex items-center gap-1">
               <Layers className="w-3 h-3 text-[#38BDF8]" />
-              MARITIME & CORRIDOR GIS
+              CORRIDOR GIS LAYERS
             </span>
           </div>
 
           <div className="space-y-1">
             {[
               { key: 'vessels', label: 'AIS Ship Traffic (10)', color: 'bg-[#38BDF8]' },
-              { key: 'shippingTrunks', label: 'Global Shipping Trunks (TSS)', color: 'bg-[#A78BFA]' },
+              { key: 'shippingTrunks', label: 'Shipping Trunks (TSS)', color: 'bg-[#A78BFA]' },
               { key: 'ports', label: 'Seaports & Berths (4)', color: 'bg-[#EF4444]' },
-              { key: 'anchorage', label: 'Outer Anchorage Zones (3)', color: 'bg-[#0284C7]' },
-              { key: 'routes', label: 'Connecting Corridors', color: 'bg-[#F59E0B]' },
+              { key: 'anchorage', label: 'Anchorage Zones (3)', color: 'bg-[#0284C7]' },
+              { key: 'routes', label: 'Corridor Corridors', color: 'bg-[#F59E0B]' },
               { key: 'trucks', label: 'Highway Fleet (5)', color: 'bg-[#10B981]' }
             ].map(item => (
               <label 
                 key={item.key} 
-                className="flex items-center gap-2 cursor-pointer hover:bg-[#1E293B] px-1 py-0.5 rounded text-[11px] text-[#E2E8F0]"
+                className="flex items-center gap-2 cursor-pointer hover:bg-[#1E293B] px-1 py-0.5 rounded text-[10px] sm:text-[11px] text-[#E2E8F0]"
               >
                 <input
                   type="checkbox"
@@ -640,7 +651,7 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
                   className="rounded bg-[#1E293B] border-[#475569] text-[#0284C7] focus:ring-0 w-3 h-3 cursor-pointer"
                 />
                 <span className={`w-2 h-2 rounded-full ${item.color}`}></span>
-                <span>{item.label}</span>
+                <span className="truncate max-w-[130px]">{item.label}</span>
               </label>
             ))}
           </div>
@@ -650,31 +661,31 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor }) {
         <div className="bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded shadow-lg flex flex-col divide-y divide-[#334155] overflow-hidden self-end">
           <button
             onClick={() => mapInstanceRef.current && mapInstanceRef.current.zoomIn()}
-            className="p-2 text-[#94A3B8] hover:text-white hover:bg-[#1E293B] transition-colors"
+            className="p-1.5 sm:p-2 text-[#94A3B8] hover:text-white hover:bg-[#1E293B] transition-colors"
             title="Zoom In"
           >
-            <ZoomIn className="w-4 h-4" />
+            <ZoomIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
           <button
             onClick={() => mapInstanceRef.current && mapInstanceRef.current.zoomOut()}
-            className="p-2 text-[#94A3B8] hover:text-white hover:bg-[#1E293B] transition-colors"
+            className="p-1.5 sm:p-2 text-[#94A3B8] hover:text-white hover:bg-[#1E293B] transition-colors"
             title="Zoom Out"
           >
-            <ZoomOut className="w-4 h-4" />
+            <ZoomOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
           <button
             onClick={resetView}
-            className="p-2 text-[#94A3B8] hover:text-white hover:bg-[#1E293B] transition-colors"
+            className="p-1.5 sm:p-2 text-[#94A3B8] hover:text-white hover:bg-[#1E293B] transition-colors"
             title="Recenter East Coast Corridor"
           >
-            <Compass className="w-4 h-4" />
+            <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
       </div>
 
       {/* Bottom Center: Live Cursor Coordinate Radar Readout */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[400] bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded px-3 py-1.5 text-[11px] text-[#E2E8F0] shadow-lg flex items-center gap-3">
-        <Crosshair className="w-3.5 h-3.5 text-[#38BDF8] animate-spin" style={{ animationDuration: '8s' }} />
+      <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 z-[400] bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-[11px] text-[#E2E8F0] shadow-lg flex items-center gap-2 sm:gap-3 max-w-[95%] truncate">
+        <Crosshair className="w-3.5 h-3.5 text-[#38BDF8] shrink-0 animate-spin" style={{ animationDuration: '8s' }} />
         <span>
           LAT: <strong className="text-white">{cursorCoords.lat.toFixed(4)}°N</strong> | LON: <strong className="text-white">{cursorCoords.lng.toFixed(4)}°E</strong>
         </span>

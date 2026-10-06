@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { FLEET_TRUCKS } from '../data/mockData';
-import { Truck, Navigation, Gauge, Fuel, Phone, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
+import { Truck, Navigation, Gauge, Fuel, Phone, AlertTriangle, CheckCircle, ArrowRight, Filter } from 'lucide-react';
 
-export function FleetView({ onSelectAsset, onTriggerBackhaul }) {
+export function FleetView({ onSelectAsset, onTriggerBackhaul, activeRole = 'all' }) {
   const [selectedTruckId, setSelectedTruckId] = useState('TK-307');
   const [filterStatus, setFilterStatus] = useState('ALL');
 
@@ -17,30 +17,35 @@ export function FleetView({ onSelectAsset, onTriggerBackhaul }) {
   const activeTruck = FLEET_TRUCKS.find(t => t.id === selectedTruckId) || FLEET_TRUCKS[0];
 
   return (
-    <div className="bg-white border border-[#CBD5E1] rounded shadow-xs p-4 flex flex-col h-full overflow-y-auto">
+    <div className="bg-white border border-[#CBD5E1] rounded shadow-xs p-3 sm:p-4 flex flex-col h-full overflow-y-auto font-mono text-xs">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-[#E2E8F0] gap-3">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Truck className="w-5 h-5 text-[#0D3B66]" />
-            <h2 className="text-base font-bold font-mono text-[#0F172A]">
+            <h2 className="text-sm sm:text-base font-bold text-[#0F172A]">
               FLEET & LAND HAULAGE DISPATCH
             </h2>
+            {activeRole === 'fleet' && (
+              <span className="px-2 py-0.5 text-[10px] font-bold bg-[#DCFCE7] text-[#15803D] rounded border border-emerald-300">
+                DISPATCH CONTROLLER
+              </span>
+            )}
           </div>
-          <p className="text-xs text-[#64748B] font-mono mt-0.5">
+          <p className="text-xs text-[#64748B] mt-0.5">
             Intermodal rig telemetry, gate hold surveillance, and real-time corridor position
           </p>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex items-center gap-1.5 font-mono text-xs">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           {['ALL', 'AVAILABLE', 'TRANSIT', 'DELAYED'].map(status => (
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
-              className={`px-2.5 py-1 rounded font-semibold transition-colors ${
+              className={`px-2.5 py-1 rounded text-xs font-semibold whitespace-nowrap transition-colors ${
                 filterStatus === status
-                  ? 'bg-[#0D3B66] text-white'
+                  ? 'bg-[#0D3B66] text-white shadow-xs'
                   : 'bg-[#F1F5F9] text-[#475569] hover:bg-[#E2E8F0]'
               }`}
             >
@@ -51,11 +56,12 @@ export function FleetView({ onSelectAsset, onTriggerBackhaul }) {
       </div>
 
       {/* Main Content Grid */}
-      <div className="my-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+      <div className="my-3 sm:my-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start flex-1">
         {/* Left: Compact Fleet List */}
-        <div className="lg:col-span-7 space-y-2 font-mono text-xs">
-          <div className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-            ACTIVE CORRIDOR RIGS ({filteredTrucks.length})
+        <div className="lg:col-span-7 space-y-2">
+          <div className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1 flex items-center justify-between">
+            <span>ACTIVE CORRIDOR RIGS ({filteredTrucks.length})</span>
+            <span className="text-[9.5px] text-[#0D3B66]">SELECT RIG</span>
           </div>
 
           <div className="space-y-2">
@@ -71,9 +77,9 @@ export function FleetView({ onSelectAsset, onTriggerBackhaul }) {
                     setSelectedTruckId(truck.id);
                     if (onSelectAsset) onSelectAsset({ ...truck, assetType: 'truck' });
                   }}
-                  className={`p-3 rounded border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                  className={`p-3 rounded-lg border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
                     isSelected
-                      ? 'bg-[#F8FAFC] border-[#0D3B66] ring-1 ring-[#0D3B66] shadow-xs'
+                      ? 'bg-[#F8FAFC] border-[#0D3B66] ring-2 ring-[#0D3B66] shadow-xs'
                       : 'bg-white hover:bg-[#F8F9FA] border-[#CBD5E1]'
                   }`}
                 >
@@ -84,7 +90,7 @@ export function FleetView({ onSelectAsset, onTriggerBackhaul }) {
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#0F172A] text-sm">{truck.id}</span>
+                        <span className="font-bold text-[#0F172A] text-xs sm:text-sm">{truck.id}</span>
                         <span className="text-[11px] text-[#64748B]">({truck.type.split(' ')[0]})</span>
                       </div>
                       <div className="text-[11px] text-[#475569] mt-0.5">
@@ -93,7 +99,7 @@ export function FleetView({ onSelectAsset, onTriggerBackhaul }) {
                     </div>
                   </div>
 
-                  <div className="text-right shrink-0">
+                  <div className="text-left sm:text-right shrink-0 flex sm:flex-col items-center sm:items-end justify-between sm:justify-center">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                       isAlert ? 'bg-red-100 text-red-700' :
                       isEmpty ? 'bg-amber-100 text-amber-800' :
@@ -101,8 +107,8 @@ export function FleetView({ onSelectAsset, onTriggerBackhaul }) {
                     }`}>
                       {truck.statusLabel}
                     </span>
-                    <div className="text-[11px] text-[#64748B] mt-1 font-semibold">
-                      {truck.capacityTons}T {truck.currentLoadTons ? `(${truck.currentLoadTons}T loaded)` : 'Capacity'}
+                    <div className="text-[10px] sm:text-[11px] text-[#64748B] sm:mt-1 font-semibold">
+                      {truck.capacityTons}T {truck.currentLoadTons ? `(${truck.currentLoadTons}T load)` : 'Capacity'}
                     </div>
                   </div>
                 </div>
@@ -112,7 +118,7 @@ export function FleetView({ onSelectAsset, onTriggerBackhaul }) {
         </div>
 
         {/* Right: Selected Rig Telemetry Card */}
-        <div className="lg:col-span-5 bg-[#F8F9FA] border border-[#CBD5E1] rounded p-3.5 flex flex-col font-mono text-xs">
+        <div className="lg:col-span-5 bg-[#F8F9FA] border border-[#CBD5E1] rounded-lg p-3.5 sm:p-4 flex flex-col">
           <div className="text-[11px] font-bold text-[#0D3B66] uppercase tracking-wider pb-2 border-b border-[#E2E8F0] flex items-center justify-between">
             <span>RIG TELEMETRY SPEC</span>
             <span className="text-[#0F172A] font-bold">{activeTruck.id}</span>
@@ -143,24 +149,24 @@ export function FleetView({ onSelectAsset, onTriggerBackhaul }) {
             <div className="grid grid-cols-2 gap-2">
               <div className="p-2 bg-white border border-[#E2E8F0] rounded">
                 <div className="text-[10px] text-[#64748B]">ODOMETER</div>
-                <div className="font-bold text-[#0F172A] mt-0.5">{activeTruck.telemetry.odometer}</div>
+                <div className="font-bold text-[#0F172A] text-xs mt-0.5">{activeTruck.telemetry.odometer}</div>
               </div>
               <div className="p-2 bg-white border border-[#E2E8F0] rounded">
                 <div className="text-[10px] text-[#64748B]">FUEL LEVEL</div>
-                <div className="font-bold text-[#0F172A] mt-0.5">{activeTruck.telemetry.fuel}</div>
+                <div className="font-bold text-[#0F172A] text-xs mt-0.5">{activeTruck.telemetry.fuel}</div>
               </div>
             </div>
 
             {/* Hold Reason / Alert */}
             {activeTruck.reason && (
               <div className="p-2.5 bg-red-50 border border-red-200 rounded text-red-900">
-                <div className="font-bold flex items-center gap-1.5">
+                <div className="font-bold flex items-center gap-1.5 text-xs">
                   <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
                   <span>CONGESTION HOLD ALERT:</span>
                 </div>
-                <div className="mt-1 font-semibold">{activeTruck.reason}</div>
-                <div className="text-[11px] text-red-700 mt-0.5">
-                  Delayed by {activeTruck.delayedByHours} hours. Telemetry indicates: {activeTruck.telemetry.cargoTemp}
+                <div className="mt-1 font-semibold text-[11px]">{activeTruck.reason}</div>
+                <div className="text-[10px] text-red-700 mt-0.5">
+                  Delayed by {activeTruck.delayedByHours} hours. Sensor: {activeTruck.telemetry.cargoTemp}
                 </div>
               </div>
             )}
