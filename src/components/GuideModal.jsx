@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Compass, Ship, Anchor, Truck, Building2, Repeat, ThermometerSnowflake, Activity, HelpCircle, BookOpen, Layers, CheckCircle2 } from 'lucide-react';
+import { X, Ship, Anchor, Truck, Building2, Repeat, ThermometerSnowflake, Activity, HelpCircle, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export function GuideModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('how-it-works');
@@ -9,106 +9,75 @@ export function GuideModal({ isOpen, onClose }) {
   const glossaryTerms = [
     {
       term: 'Shared Route Graph',
-      def: 'A unified digital network representing the full physical journey (Sea ➔ Port ➔ Land ➔ Warehouse) so a delay at any node automatically cascades and updates all downstream schedules.'
+      def: 'A single connected timeline combining all 4 legs of freight (Sea ➔ Port ➔ Highway ➔ Warehouse). When any delay occurs upstream, downstream steps automatically recalibrate.'
     },
     {
       term: 'AIS (Automatic Identification System)',
-      def: 'Real-time satellite and coastal radio transponder data reporting ship position, speed over ground (SOG), and course over ground (COG).'
+      def: 'Live satellite and coastal radio transponders reporting ship coordinates, nautical speed (knots), and heading.'
     },
     {
-      term: 'Dwell Time',
-      def: 'The total duration cargo or a vessel spends waiting at anchorage, port berths, or gate plazas before processing.'
+      term: 'Port Dwell Time',
+      def: 'The hours a ship spends waiting at anchorage or a container spends in the port terminal yard before being loaded onto trucks.'
     },
     {
       term: 'Deadhead Mileage',
-      def: 'Miles driven by empty trucks returning after delivery without cargo. Waypoint matches these empty return legs with new loads to recover revenue.'
+      def: 'Miles driven by empty trucks returning after delivery without cargo. Waypoint matches these empty return legs with new loads to eliminate waste.'
     },
     {
       term: 'Backhaul Matching',
-      def: 'Algorithmically pairing empty returning rigs with regional shippers to eliminate empty runs and reduce diesel emissions.'
+      def: 'Algorithmically pairing empty returning trucks with shippers needing freight transport, generating extra revenue and reducing carbon emissions.'
     },
     {
       term: 'Reefer Telemetry',
-      def: 'Continuous temperature and compressor sensors inside refrigerated containers safeguarding pharma and frozen perishable shipments.'
+      def: 'Continuous IoT temperature sensors inside refrigerated containers safeguarding pharma vaccines and frozen produce.'
     },
     {
       term: 'Cascade Impact',
-      def: 'A simulation demonstrating how a single 16-hour port delay affects 7 ships, 26 trucks, 11 backhauls, and 3 cold-chain consignments.'
-    }
-  ];
-
-  const roleGuides = [
-    {
-      role: 'Cargo Owner / Importer',
-      icon: Ship,
-      desc: 'Track individual containers, monitor live temperature curves, compare original SLA vs dynamic predicted ETA, and request fast-track yard staging.'
-    },
-    {
-      role: 'Port Operations',
-      icon: Anchor,
-      desc: 'Surveil outer anchorage queues, monitor berth occupancy (B-01 through B-06), and examine 72-hour congestion forecasts to allocate pilot windows.'
-    },
-    {
-      role: 'Fleet & Haulage Dispatch',
-      icon: Truck,
-      desc: 'Monitor highway rigs, avoid empty deadhead miles by accepting high-match backhaul loads, and track driver status.'
-    },
-    {
-      role: 'Cold-Chain Surveillance',
-      icon: ThermometerSnowflake,
-      desc: 'Protect temperature-sensitive biologics and vaccines with real-time IoT alerts, compressor duty cycles, and auxiliary cooling boost overrides.'
-    },
-    {
-      role: 'Control Tower (All Corridors)',
-      icon: Layers,
-      desc: 'Unified panoramic view across all East Coast corridor layers with interactive GIS nautical radar map and network impact simulation.'
+      def: 'The ripple effect of how a single 16-hour port delay cascades across 7 ships, 26 highway trucks, 11 backhauls, and 3 cold-chain consignments.'
     }
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0F172A]/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 font-mono">
-      <div className="bg-white border border-[#CBD5E1] rounded-lg max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        {/* Modal Header */}
-        <div className="p-4 bg-[#0F172A] text-white flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded bg-[#0D3B66] text-[#38BDF8] border border-[#38BDF8]/40 flex items-center justify-center font-bold text-sm">
-              WP
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        {/* Header */}
+        <div className="p-5 bg-white border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600">
+              <HelpCircle className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-bold text-sm sm:text-base flex items-center gap-2">
-                <span>WAYPOINT CORRIDOR GUIDE</span>
-                <span className="text-[10px] px-1.5 py-0.2 bg-[#1E293B] text-[#38BDF8] border border-[#38BDF8]/30 rounded">
-                  USER MANUAL
-                </span>
-              </div>
-              <div className="text-[11px] text-[#94A3B8]">
-                Understand how Waypoint unifies Sea, Port, Land, and Warehouse nodes
-              </div>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900">
+                How Waypoint Works
+              </h2>
+              <p className="text-xs text-slate-500">
+                Corridor intelligence for freight — sea to warehouse door
+              </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 text-[#94A3B8] hover:text-white hover:bg-[#1E293B] rounded transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab Selection */}
-        <div className="flex items-center border-b border-[#E2E8F0] bg-[#F8F9FA] px-4 pt-2 gap-2 text-xs">
+        <div className="flex items-center border-b border-slate-100 bg-slate-50/50 px-5 pt-2 gap-3 text-xs">
           {[
-            { id: 'how-it-works', label: '1. How Waypoint Works' },
-            { id: 'personas', label: '2. Role Personas' },
+            { id: 'how-it-works', label: '1. The Core Idea' },
+            { id: 'personas', label: '2. Who Uses It?' },
             { id: 'glossary', label: '3. Freight Glossary' }
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-2 border-b-2 font-bold transition-all ${
+              className={`pb-2.5 font-bold transition-all border-b-2 cursor-pointer ${
                 activeTab === tab.id
-                  ? 'border-[#0D3B66] text-[#0D3B66] bg-white rounded-t'
-                  : 'border-transparent text-[#64748B] hover:text-[#0F172A]'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
               }`}
             >
               {tab.label}
@@ -117,57 +86,60 @@ export function GuideModal({ isOpen, onClose }) {
         </div>
 
         {/* Modal Body */}
-        <div className="p-4 sm:p-5 overflow-y-auto space-y-4 text-xs flex-1">
+        <div className="p-5 overflow-y-auto space-y-4 text-xs flex-1">
           {activeTab === 'how-it-works' && (
             <div className="space-y-4">
-              <div className="p-3.5 bg-[#EFF6FF] border border-[#BFDBFE] rounded text-[#1E40AF]">
-                <div className="font-bold text-sm mb-1 text-[#0D3B66]">
-                  The Core Breakthrough: The Shared Route Graph
+              <div className="p-4 bg-blue-50/70 border border-blue-100 rounded-xl text-slate-800">
+                <div className="font-bold text-sm text-blue-900 mb-1">
+                  Why Waypoint is Different
                 </div>
-                <div className="text-[11px] leading-relaxed text-[#334155]">
-                  Conventional supply chains operate in isolated silos — shipping lines don't know truck schedules, and warehouses only find out about delays when goods fail to arrive. <strong>WAYPOINT connects all 4 physical tiers on a single live graph</strong> so when an event happens at sea, the entire corridor automatically adapts.
-                </div>
+                <p className="text-xs text-slate-700 leading-relaxed">
+                  Traditional logistics software manages Shipping, Seaports, Trucking, and Warehouses as 4 disconnected silos. When a container vessel is delayed at sea, nobody notifies the inland trucking dispatch or the destination cold storage warehouse.
+                </p>
+                <p className="text-xs text-slate-700 leading-relaxed mt-2 font-medium">
+                  <strong>Waypoint connects the entire multi-modal chain on a single shared route graph</strong> so that any delay upstream automatically recalculates downstream schedules, avoids empty truck runs, and protects cold-chain perishables.
+                </p>
               </div>
 
-              {/* Step Sequence */}
+              {/* 4 Steps */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3 bg-[#F8F9FA] border border-[#CBD5E1] rounded">
-                  <div className="flex items-center gap-2 text-[#0D3B66] font-bold mb-1">
-                    <Ship className="w-4 h-4 text-[#0284C7]" />
-                    <span>1. SEA (Bay of Bengal AIS)</span>
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-2 font-bold text-slate-900 mb-1">
+                    <Ship className="w-4 h-4 text-blue-600" />
+                    <span>1. Sea Transit</span>
                   </div>
-                  <p className="text-[#64748B] text-[11px]">
-                    Continuous tracking of container vessels, nautical speeds, and outer anchorage arrival times.
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    Live tracking of container ships via AIS telemetry, arrival ETAs, and speed over ground.
                   </p>
                 </div>
 
-                <div className="p-3 bg-[#F8F9FA] border border-[#CBD5E1] rounded">
-                  <div className="flex items-center gap-2 text-[#0D3B66] font-bold mb-1">
-                    <Anchor className="w-4 h-4 text-[#EF4444]" />
-                    <span>2. PORT (Harbour & Berths)</span>
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-2 font-bold text-slate-900 mb-1">
+                    <Anchor className="w-4 h-4 text-rose-600" />
+                    <span>2. Seaport & Berths</span>
                   </div>
-                  <p className="text-[#64748B] text-[11px]">
-                    Predictive queue dwell modeling (e.g. Vizag peak 81% at +48h) and berth crane allocation.
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    Predictive queue dwell forecasting (e.g. Vizag peak 81%) and crane discharge prioritization.
                   </p>
                 </div>
 
-                <div className="p-3 bg-[#F8F9FA] border border-[#CBD5E1] rounded">
-                  <div className="flex items-center gap-2 text-[#0D3B66] font-bold mb-1">
-                    <Truck className="w-4 h-4 text-[#F59E0B]" />
-                    <span>3. LAND (Corridor Trucking)</span>
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-2 font-bold text-slate-900 mb-1">
+                    <Truck className="w-4 h-4 text-emerald-600" />
+                    <span>3. Highway Haulage</span>
                   </div>
-                  <p className="text-[#64748B] text-[11px]">
-                    Highway dispatch (NH-65/NH-44), gate staging queues, and instant empty backhaul load matching.
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    Road dispatch on key corridors with instant backhaul matching for empty returning trucks.
                   </p>
                 </div>
 
-                <div className="p-3 bg-[#F8F9FA] border border-[#CBD5E1] rounded">
-                  <div className="flex items-center gap-2 text-[#0D3B66] font-bold mb-1">
-                    <Building2 className="w-4 h-4 text-[#10B981]" />
-                    <span>4. WAREHOUSE (Receiving Door)</span>
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-2 font-bold text-slate-900 mb-1">
+                    <Building2 className="w-4 h-4 text-teal-600" />
+                    <span>4. Warehouse Door</span>
                   </div>
-                  <p className="text-[#64748B] text-[11px]">
-                    Pre-conditioning cold storage chambers and synchronizing dock doors for arrival.
+                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                    Automatic receiving dock reservations and pre-conditioned cold storage chambers.
                   </p>
                 </div>
               </div>
@@ -176,21 +148,26 @@ export function GuideModal({ isOpen, onClose }) {
 
           {activeTab === 'personas' && (
             <div className="space-y-3">
-              <div className="text-[#64748B] text-[11px]">
-                Click the <strong>Role Switcher</strong> in the top header or navigation bar anytime to filter data specifically for each role:
-              </div>
+              <p className="text-slate-600 text-xs">
+                Waypoint is customized for every stakeholder in the freight corridor:
+              </p>
 
               <div className="space-y-2.5">
-                {roleGuides.map((rg, idx) => {
-                  const Icon = rg.icon;
+                {[
+                  { title: 'Cargo Owners & Importers', desc: 'Track your shipments, view dynamic delivery ETAs, customs documents, and issue one-click priority yard staging passes.', icon: Package, color: 'text-blue-600 bg-blue-50' },
+                  { title: 'Port Operations Managers', desc: 'Monitor outer anchorage queues, berth capacity (B-01 to B-06), and 72-hour congestion forecast curves.', icon: Anchor, color: 'text-rose-600 bg-rose-50' },
+                  { title: 'Fleet & Haulage Dispatchers', desc: 'Manage road rigs, eliminate costly empty deadhead runs, and capture revenue through instant load matches.', icon: Truck, color: 'text-emerald-600 bg-emerald-50' },
+                  { title: 'Cold-Chain Surveillance Teams', desc: 'Surveil live temperature curves for sensitive vaccines and biologics, with auxiliary cooling overrides.', icon: ThermometerSnowflake, color: 'text-teal-600 bg-teal-50' }
+                ].map((item, idx) => {
+                  const Icon = item.icon;
                   return (
-                    <div key={idx} className="p-3 bg-[#F8F9FA] border border-[#CBD5E1] rounded flex items-start gap-3">
-                      <div className="p-2 bg-white rounded border border-[#E2E8F0] shrink-0 mt-0.5">
-                        <Icon className="w-4 h-4 text-[#0D3B66]" />
+                    <div key={idx} className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-3">
+                      <div className={`p-2 rounded-lg shrink-0 mt-0.5 ${item.color}`}>
+                        <Icon className="w-4 h-4" />
                       </div>
                       <div>
-                        <div className="font-bold text-[#0F172A] text-xs">{rg.role}</div>
-                        <div className="text-[#475569] text-[11px] mt-0.5 leading-relaxed">{rg.desc}</div>
+                        <div className="font-bold text-slate-900 text-xs">{item.title}</div>
+                        <p className="text-slate-600 text-[11px] mt-0.5 leading-relaxed">{item.desc}</p>
                       </div>
                     </div>
                   );
@@ -202,23 +179,23 @@ export function GuideModal({ isOpen, onClose }) {
           {activeTab === 'glossary' && (
             <div className="space-y-2.5">
               {glossaryTerms.map((gt, idx) => (
-                <div key={idx} className="p-2.5 bg-[#F8F9FA] border border-[#E2E8F0] rounded">
-                  <div className="font-bold text-[#0D3B66] text-xs">{gt.term}</div>
-                  <div className="text-[#475569] text-[11px] mt-0.5 leading-relaxed">{gt.def}</div>
+                <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="font-bold text-slate-900 text-xs">{gt.term}</div>
+                  <p className="text-slate-600 text-[11px] mt-0.5 leading-relaxed">{gt.def}</p>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Modal Footer */}
-        <div className="p-3 bg-[#F8F9FA] border-t border-[#E2E8F0] flex items-center justify-between text-[11px] text-[#64748B]">
-          <span>Waypoint Prototype v2.4 • East Coast Corridor</span>
+        {/* Footer */}
+        <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>Waypoint Prototype • East Coast Freight Corridor</span>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 bg-[#0D3B66] hover:bg-[#0A2E50] text-white rounded font-bold text-xs transition-colors"
+            className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-semibold transition-colors cursor-pointer"
           >
-            GOT IT
+            Got It
           </button>
         </div>
       </div>

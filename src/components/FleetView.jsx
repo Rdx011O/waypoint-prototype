@@ -17,54 +17,53 @@ export function FleetView({ onSelectAsset, onTriggerBackhaul, activeRole = 'all'
   const activeTruck = FLEET_TRUCKS.find(t => t.id === selectedTruckId) || FLEET_TRUCKS[0];
 
   return (
-    <div className="bg-white border border-[#CBD5E1] rounded shadow-xs p-3 sm:p-4 flex flex-col h-full overflow-y-auto font-mono text-xs">
+    <div className="bg-slate-50/60 p-4 sm:p-6 flex flex-col h-full overflow-y-auto space-y-4">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-[#E2E8F0] gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-slate-200 gap-3">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Truck className="w-5 h-5 text-[#0D3B66]" />
-            <h2 className="text-sm sm:text-base font-bold text-[#0F172A]">
-              FLEET & LAND HAULAGE DISPATCH
-            </h2>
-            {activeRole === 'fleet' && (
-              <span className="px-2 py-0.5 text-[10px] font-bold bg-[#DCFCE7] text-[#15803D] rounded border border-emerald-300">
-                DISPATCH CONTROLLER
-              </span>
-            )}
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-lg bg-emerald-50 text-emerald-700">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+                Fleet Dispatch & Highway Haulage
+              </h1>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Intermodal rig telemetry, gate hold surveillance, and real-time corridor position
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-[#64748B] mt-0.5">
-            Intermodal rig telemetry, gate hold surveillance, and real-time corridor position
-          </p>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        {/* Filter Pills */}
+        <div className="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-slate-200 overflow-x-auto no-scrollbar shadow-2xs">
           {['ALL', 'AVAILABLE', 'TRANSIT', 'DELAYED'].map(status => (
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
-              className={`px-2.5 py-1 rounded text-xs font-semibold whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 filterStatus === status
-                  ? 'bg-[#0D3B66] text-white shadow-xs'
-                  : 'bg-[#F1F5F9] text-[#475569] hover:bg-[#E2E8F0]'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              {status}
+              {status === 'ALL' ? 'All Trucks' : status.charAt(0) + status.slice(1).toLowerCase()}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="my-3 sm:my-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start flex-1">
-        {/* Left: Compact Fleet List */}
-        <div className="lg:col-span-7 space-y-2">
-          <div className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1 flex items-center justify-between">
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start flex-1">
+        {/* Left: Truck List */}
+        <div className="lg:col-span-7 space-y-3">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-700 px-1">
             <span>ACTIVE CORRIDOR RIGS ({filteredTrucks.length})</span>
-            <span className="text-[9.5px] text-[#0D3B66]">SELECT RIG</span>
+            <span className="text-slate-400 font-normal text-[11px]">Click to inspect</span>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {filteredTrucks.map(truck => {
               const isSelected = selectedTruckId === truck.id;
               const isAlert = truck.status === 'DELAYED_HOLD';
@@ -77,37 +76,37 @@ export function FleetView({ onSelectAsset, onTriggerBackhaul, activeRole = 'all'
                     setSelectedTruckId(truck.id);
                     if (onSelectAsset) onSelectAsset({ ...truck, assetType: 'truck' });
                   }}
-                  className={`p-3 rounded-lg border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
+                  className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                     isSelected
-                      ? 'bg-[#F8FAFC] border-[#0D3B66] ring-2 ring-[#0D3B66] shadow-xs'
-                      : 'bg-white hover:bg-[#F8F9FA] border-[#CBD5E1]'
+                      ? 'bg-white border-blue-600 shadow-md ring-2 ring-blue-100'
+                      : 'bg-white hover:bg-slate-50/80 border-slate-200 shadow-2xs'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{
-                      backgroundColor: isAlert ? '#DC2626' : isEmpty ? '#D97706' : '#059669'
+                  <div className="flex items-center gap-3.5">
+                    <span className="w-3 h-3 rounded-full shrink-0" style={{
+                      backgroundColor: isAlert ? '#E11D48' : isEmpty ? '#D97706' : '#059669'
                     }} />
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#0F172A] text-xs sm:text-sm">{truck.id}</span>
-                        <span className="text-[11px] text-[#64748B]">({truck.type.split(' ')[0]})</span>
+                        <span className="font-bold text-slate-900 text-sm">{truck.id}</span>
+                        <span className="text-xs text-slate-500 font-medium">({truck.type.split(' ')[0]})</span>
                       </div>
-                      <div className="text-[11px] text-[#475569] mt-0.5">
+                      <div className="text-xs text-slate-600 mt-0.5">
                         {truck.currentLocation}
                       </div>
                     </div>
                   </div>
 
                   <div className="text-left sm:text-right shrink-0 flex sm:flex-col items-center sm:items-end justify-between sm:justify-center">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      isAlert ? 'bg-red-100 text-red-700' :
-                      isEmpty ? 'bg-amber-100 text-amber-800' :
-                      'bg-green-100 text-green-800'
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                      isAlert ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                      isEmpty ? 'bg-amber-50 text-amber-800 border border-amber-200' :
+                      'bg-emerald-50 text-emerald-800 border border-emerald-200'
                     }`}>
                       {truck.statusLabel}
                     </span>
-                    <div className="text-[10px] sm:text-[11px] text-[#64748B] sm:mt-1 font-semibold">
+                    <div className="text-xs text-slate-500 mt-1 font-medium">
                       {truck.capacityTons}T {truck.currentLoadTons ? `(${truck.currentLoadTons}T load)` : 'Capacity'}
                     </div>
                   </div>
@@ -117,67 +116,65 @@ export function FleetView({ onSelectAsset, onTriggerBackhaul, activeRole = 'all'
           </div>
         </div>
 
-        {/* Right: Selected Rig Telemetry Card */}
-        <div className="lg:col-span-5 bg-[#F8F9FA] border border-[#CBD5E1] rounded-lg p-3.5 sm:p-4 flex flex-col">
-          <div className="text-[11px] font-bold text-[#0D3B66] uppercase tracking-wider pb-2 border-b border-[#E2E8F0] flex items-center justify-between">
-            <span>RIG TELEMETRY SPEC</span>
-            <span className="text-[#0F172A] font-bold">{activeTruck.id}</span>
+        {/* Right: Selected Rig Detail */}
+        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 className="text-xs font-bold text-slate-900 uppercase">
+              Rig Telemetry & Driver Spec
+            </h3>
+            <span className="font-bold text-slate-900 text-sm">{activeTruck.id}</span>
           </div>
 
-          <div className="mt-3 space-y-3 flex-1">
-            {/* Driver & Rig Spec */}
-            <div className="p-2.5 bg-white border border-[#E2E8F0] rounded space-y-1.5">
+          <div className="space-y-3 text-xs">
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 space-y-2">
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Driver:</span>
-                <span className="font-bold text-[#0F172A]">{activeTruck.driver}</span>
+                <span className="text-slate-500">Driver Name:</span>
+                <span className="font-bold text-slate-900">{activeTruck.driver}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Driver Contact:</span>
-                <span className="font-bold text-[#0D3B66]">{activeTruck.phone}</span>
+                <span className="text-slate-500">Phone Contact:</span>
+                <span className="font-bold text-blue-700">{activeTruck.phone}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Rig Class:</span>
-                <span className="font-bold text-[#0F172A]">{activeTruck.type}</span>
+                <span className="text-slate-500">Vehicle Class:</span>
+                <span className="font-bold text-slate-900">{activeTruck.type}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Assigned Corridor:</span>
-                <span className="font-bold text-[#0F172A]">{activeTruck.assignedCorridor}</span>
+                <span className="text-slate-500">Corridor Route:</span>
+                <span className="font-bold text-slate-900">{activeTruck.assignedCorridor}</span>
               </div>
             </div>
 
-            {/* IoT Telemetry Metrics */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-2 bg-white border border-[#E2E8F0] rounded">
-                <div className="text-[10px] text-[#64748B]">ODOMETER</div>
-                <div className="font-bold text-[#0F172A] text-xs mt-0.5">{activeTruck.telemetry.odometer}</div>
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                <div className="text-[10px] text-slate-400 font-semibold uppercase">Odometer</div>
+                <div className="font-bold text-slate-900 text-sm mt-0.5">{activeTruck.telemetry.odometer}</div>
               </div>
-              <div className="p-2 bg-white border border-[#E2E8F0] rounded">
-                <div className="text-[10px] text-[#64748B]">FUEL LEVEL</div>
-                <div className="font-bold text-[#0F172A] text-xs mt-0.5">{activeTruck.telemetry.fuel}</div>
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center">
+                <div className="text-[10px] text-slate-400 font-semibold uppercase">Fuel Level</div>
+                <div className="font-bold text-slate-900 text-sm mt-0.5">{activeTruck.telemetry.fuel}</div>
               </div>
             </div>
 
-            {/* Hold Reason / Alert */}
             {activeTruck.reason && (
-              <div className="p-2.5 bg-red-50 border border-red-200 rounded text-red-900">
-                <div className="font-bold flex items-center gap-1.5 text-xs">
-                  <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
-                  <span>CONGESTION HOLD ALERT:</span>
+              <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-slate-800 space-y-1">
+                <div className="font-bold flex items-center gap-1.5 text-xs text-rose-800">
+                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>Congestion Hold Notice</span>
                 </div>
-                <div className="mt-1 font-semibold text-[11px]">{activeTruck.reason}</div>
-                <div className="text-[10px] text-red-700 mt-0.5">
-                  Delayed by {activeTruck.delayedByHours} hours. Sensor: {activeTruck.telemetry.cargoTemp}
+                <div className="font-medium text-xs mt-0.5">{activeTruck.reason}</div>
+                <div className="text-[11px] text-slate-600">
+                  Delayed by {activeTruck.delayedByHours} hours. Telemetry cargo temp: {activeTruck.telemetry.cargoTemp}
                 </div>
               </div>
             )}
 
-            {/* Action buttons */}
             {activeTruck.hasBackhaulMatch && (
               <button
                 onClick={onTriggerBackhaul}
-                className="w-full py-2 bg-[#059669] hover:bg-[#047857] text-white rounded text-xs font-bold transition-colors shadow-xs"
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer"
               >
-                VIEW BACKHAUL OPPORTUNITY (94% MATCH) ➔
+                View 94% Backhaul Match (₹42,000 Payout) ➔
               </button>
             )}
           </div>

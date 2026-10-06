@@ -12,10 +12,10 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
   const activePort = PORTS.find(p => p.id === selectedPortId) || PORTS[0];
 
   const forecastData = [
-    { hour: 'NOW', congestion: activePort.forecast.now, threshold: 75 },
-    { hour: '+24H', congestion: activePort.forecast.h24, threshold: 75 },
-    { hour: '+48H', congestion: activePort.forecast.h48, threshold: 75 },
-    { hour: '+72H', congestion: activePort.forecast.h72, threshold: 75 }
+    { hour: 'Now', congestion: activePort.forecast.now, threshold: 75 },
+    { hour: '+24h', congestion: activePort.forecast.h24, threshold: 75 },
+    { hour: '+48h Peak', congestion: activePort.forecast.h48, threshold: 75 },
+    { hour: '+72h', congestion: activePort.forecast.h72, threshold: 75 }
   ];
 
   const inboundVessels = VESSELS.filter(v => v.destPortId === activePort.id);
@@ -24,34 +24,33 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
     setClearedBerth(true);
     addToast({
       type: 'success',
-      title: 'BERTH 04 FAST-TRACK ALLOCATED',
-      message: `Priority Reefer Finger Pier allocated for incoming medical cargo. Expected turnaround reduced to 2.5 hours.`
+      title: 'Priority Berth Allocated',
+      message: `Berth 04 allocated for incoming temperature-controlled cargo. Dwell time reduced to 2.5 hours.`
     });
   };
 
   return (
-    <div className="bg-white border border-[#CBD5E1] rounded shadow-xs p-3 sm:p-4 flex flex-col h-full overflow-y-auto font-mono text-xs">
-      {/* Port Selector Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-[#E2E8F0] gap-3">
+    <div className="bg-slate-50/60 p-4 sm:p-6 flex flex-col h-full overflow-y-auto space-y-4">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-slate-200 gap-3">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Anchor className="w-5 h-5 text-[#0D3B66]" />
-            <h2 className="text-sm sm:text-base font-bold text-[#0F172A]">
-              PORT CONGESTION & HARBOUR INTELLIGENCE
-            </h2>
-            {activeRole === 'port' && (
-              <span className="px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-700 border border-red-200 rounded">
-                PORT OPERATIONS MANAGER ACTIVE
-              </span>
-            )}
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-lg bg-rose-50 text-rose-700">
+              <Anchor className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+                Port Congestion & Berth Intelligence
+              </h1>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Outer anchorage queue surveillance, predictive dwell modeling, and berth allocation
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-[#64748B] mt-0.5">
-            Predictive dwell, berth allocation, and downstream corridor queue modeling
-          </p>
         </div>
 
-        {/* Port Switcher Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        {/* Port Tabs */}
+        <div className="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-slate-200 overflow-x-auto no-scrollbar shadow-2xs">
           {PORTS.map(p => (
             <button
               key={p.id}
@@ -60,15 +59,15 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
                 setClearedBerth(false);
                 if (onSelectAsset) onSelectAsset({ ...p, assetType: 'port' });
               }}
-              className={`px-3 py-1.5 rounded text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 selectedPortId === p.id
-                  ? 'bg-[#0D3B66] text-white shadow-xs'
-                  : 'bg-[#F1F5F9] text-[#475569] hover:bg-[#E2E8F0]'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
               <span>{p.shortName}</span>
-              <span className={`px-1 py-0.2 rounded text-[10px] font-bold ${
-                p.congestion > 60 ? 'bg-red-500 text-white' : 'bg-slate-700 text-white'
+              <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
+                p.congestion > 60 ? 'bg-rose-500 text-white' : 'bg-slate-200 text-slate-700'
               }`}>
                 {p.congestion}%
               </span>
@@ -77,23 +76,23 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
         </div>
       </div>
 
-      {/* Main Port Analytics Grid */}
-      <div className="my-3 sm:my-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start flex-1">
-        {/* Left Column: Forecast Chart & Harbor Berthing Map */}
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start flex-1">
+        {/* Left Column: Congestion Curve & Berth Allocation */}
         <div className="lg:col-span-7 space-y-4">
           {/* Congestion Forecast Chart Card */}
-          <div className="bg-[#F8F9FA] border border-[#CBD5E1] rounded-lg p-3.5 sm:p-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-1">
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-1">
               <div>
-                <span className="text-xs font-bold text-[#0F172A]">
-                  CONGESTION FORECAST (72H HORIZON)
-                </span>
-                <span className="text-[11px] text-[#64748B] ml-2">
+                <h2 className="text-sm font-bold text-slate-900">
+                  Congestion Trajectory (72-Hour Horizon)
+                </h2>
+                <div className="text-xs text-slate-500">
                   {activePort.name} ({activePort.code})
-                </span>
+                </div>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 bg-red-100 text-red-700 rounded border border-red-200 self-start sm:self-auto">
-                PEAK AT +48H ({activePort.forecast.h48}%)
+              <span className="text-xs font-bold px-2.5 py-1 bg-rose-50 text-rose-700 rounded-full border border-rose-200 self-start sm:self-auto">
+                Peak at +48h ({activePort.forecast.h48}%)
               </span>
             </div>
 
@@ -101,58 +100,58 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
             <div className="h-44 sm:h-48 w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={forecastData} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
-                  <XAxis dataKey="hour" tick={{ fontSize: 11, fontFamily: 'IBM Plex Mono' }} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 11, fontFamily: 'IBM Plex Mono' }} />
+                  <XAxis dataKey="hour" tick={{ fontSize: 11, fill: '#64748B' }} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#64748B' }} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0F172A', color: '#FFF', borderRadius: '4px', fontSize: '11px', fontFamily: 'IBM Plex Mono' }}
+                    contentStyle={{ backgroundColor: '#0F172A', color: '#FFF', borderRadius: '8px', fontSize: '11px' }}
                     formatter={(val) => [`${val}% Congestion`, 'Forecast']}
                   />
-                  <ReferenceLine y={75} stroke="#DC2626" strokeDasharray="3 3" label={{ value: 'CRITICAL (75%)', position: 'insideTopRight', fill: '#DC2626', fontSize: 9, fontFamily: 'IBM Plex Mono' }} />
+                  <ReferenceLine y={75} stroke="#E11D48" strokeDasharray="3 3" label={{ value: 'Critical Threshold (75%)', position: 'insideTopRight', fill: '#E11D48', fontSize: 10 }} />
                   <Line 
                     type="monotone" 
                     dataKey="congestion" 
-                    stroke="#0D3B66" 
-                    strokeWidth={3} 
-                    dot={{ r: 4, fill: '#0D3B66' }} 
-                    activeDot={{ r: 6, fill: '#DC2626' }} 
+                    stroke="#0F172A" 
+                    strokeWidth={2.5} 
+                    dot={{ r: 4, fill: '#0F172A' }} 
+                    activeDot={{ r: 6, fill: '#E11D48' }} 
                   />
                 </LineChart>
               </ResponsiveContainer>
             </div>
 
-            {/* Forecast Data Strip */}
-            <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-[#E2E8F0] text-center">
-              <div>
-                <div className="text-[10px] text-[#64748B]">NOW</div>
-                <div className="text-xs sm:text-sm font-bold text-[#0F172A]">{activePort.forecast.now}%</div>
+            {/* Forecast Strip */}
+            <div className="grid grid-cols-4 gap-2 mt-4 pt-3 border-t border-slate-100 text-center">
+              <div className="p-2 bg-slate-50 rounded-lg">
+                <div className="text-[10px] text-slate-500 font-medium">NOW</div>
+                <div className="text-sm font-bold text-slate-800">{activePort.forecast.now}%</div>
               </div>
-              <div>
-                <div className="text-[10px] text-[#64748B]">+24H</div>
-                <div className="text-xs sm:text-sm font-bold text-[#0F172A]">{activePort.forecast.h24}%</div>
+              <div className="p-2 bg-slate-50 rounded-lg">
+                <div className="text-[10px] text-slate-500 font-medium">+24H</div>
+                <div className="text-sm font-bold text-slate-800">{activePort.forecast.h24}%</div>
               </div>
-              <div className="bg-red-50 py-1 rounded border border-red-200">
-                <div className="text-[10px] text-red-600 font-bold">+48H PEAK</div>
-                <div className="text-xs sm:text-sm font-bold text-red-700">{activePort.forecast.h48}%</div>
+              <div className="p-2 bg-rose-50 rounded-lg border border-rose-100">
+                <div className="text-[10px] text-rose-700 font-bold">+48H PEAK</div>
+                <div className="text-sm font-bold text-rose-700">{activePort.forecast.h48}%</div>
               </div>
-              <div>
-                <div className="text-[10px] text-[#64748B]">+72H</div>
-                <div className="text-xs sm:text-sm font-bold text-[#0F172A]">{activePort.forecast.h72}%</div>
+              <div className="p-2 bg-slate-50 rounded-lg">
+                <div className="text-[10px] text-slate-500 font-medium">+72H</div>
+                <div className="text-sm font-bold text-slate-800">{activePort.forecast.h72}%</div>
               </div>
             </div>
           </div>
 
-          {/* Harbor Berth Allocation Diagram */}
-          <div className="bg-[#F8F9FA] border border-[#CBD5E1] rounded-lg p-3.5 sm:p-4 text-xs">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-[#E2E8F0] gap-1">
-              <span className="font-bold text-[#0F172A] uppercase">
-                BERTH OCCUPANCY & FINGER PIER DIAGRAM
-              </span>
-              <span className="text-[10px] text-[#059669] font-bold">
-                {clearedBerth ? 'PRIORITY REEFER BERTH ASSIGNED' : '2 / 18 BERTHS VACANT'}
+          {/* Finger Pier Berth Occupancy */}
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-slate-100 gap-1">
+              <h3 className="text-xs font-bold text-slate-900 uppercase">
+                Berth Occupancy & Terminal Finger Piers
+              </h3>
+              <span className="text-xs font-semibold text-emerald-700">
+                {clearedBerth ? 'Priority Reefer Berth Allocated' : '2 of 18 Berths Available'}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {(activePort.berthsList || [
                 { id: "B-01", name: "Berth 1", occupied: true, vessel: "Bulk Cargo Carrier", dwell: "18h left" },
                 { id: "B-02", name: "Berth 2 (VCTPL)", occupied: true, vessel: "MV Eastern Pearl", dwell: "14.5h hold" },
@@ -161,22 +160,22 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
               ]).map(berth => (
                 <div 
                   key={berth.id}
-                  className={`p-2.5 rounded border transition-all ${
+                  className={`p-3 rounded-xl border transition-all ${
                     berth.occupied
-                      ? 'bg-white border-[#E2E8F0]'
-                      : 'bg-emerald-50 border-emerald-300 ring-1 ring-emerald-200'
+                      ? 'bg-slate-50/70 border-slate-200'
+                      : 'bg-emerald-50/60 border-emerald-300 ring-1 ring-emerald-100'
                   }`}
                 >
                   <div className="flex justify-between items-center">
-                    <span className="font-bold text-[#0F172A]">{berth.id}: {berth.name}</span>
-                    <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
-                      berth.occupied ? 'bg-slate-200 text-slate-800' : 'bg-emerald-600 text-white'
+                    <span className="font-bold text-slate-900 text-xs">{berth.id}: {berth.name}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      berth.occupied ? 'bg-slate-200 text-slate-700' : 'bg-emerald-600 text-white'
                     }`}>
-                      {berth.occupied ? 'OCCUPIED' : 'VACANT'}
+                      {berth.occupied ? 'Occupied' : 'Vacant'}
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#475569] mt-1 font-semibold">{berth.vessel}</div>
-                  <div className="text-[10px] text-[#64748B] mt-0.5">Dwell Status: {berth.dwell}</div>
+                  <div className="text-xs text-slate-700 mt-1 font-medium">{berth.vessel}</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">Dwell Status: {berth.dwell}</div>
                 </div>
               ))}
             </div>
@@ -184,100 +183,98 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
             {!clearedBerth && selectedPortId === 'PORT-VTZ' && (
               <button
                 onClick={handleClearBerth}
-                className="w-full mt-3 py-2 bg-[#0D3B66] hover:bg-[#0A2E50] text-white rounded font-bold text-xs transition-colors shadow-xs"
+                className="w-full mt-2 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer"
               >
-                FAST-TRACK COLD-CHAIN DWELL: ALLOCATE PRIORITY BERTH 04 ➔
+                Fast-Track Cold-Chain Dwell: Allocate Priority Berth 04 ➔
               </button>
             )}
             {clearedBerth && (
-              <div className="mt-3 p-2.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded font-bold text-center text-xs flex items-center justify-center gap-1.5">
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg font-semibold text-emerald-900 text-xs flex items-center justify-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>BERTH 04 ALLOCATED — ESTIMATED DWELL REDUCED TO 2.5 HOURS</span>
+                <span>Berth 04 allocated. Estimated container dwell reduced to 2.5 hours.</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Right Column: Affected Downstream Network */}
-        <div className="lg:col-span-5 space-y-4 text-xs">
-          <div className="bg-[#F8F9FA] border border-[#CBD5E1] rounded-lg p-3.5 sm:p-4">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
-              <span className="text-xs font-bold text-[#0F172A]">
-                AFFECTED DOWNSTREAM NETWORK
-              </span>
-              <span className="text-[10px] text-[#64748B]">
-                GRAPH CASCADE
-              </span>
+        <div className="lg:col-span-5 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="text-xs font-bold text-slate-900 uppercase">
+                Affected Downstream Network
+              </h3>
+              <span className="text-xs text-slate-400">Live Impact</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 mt-3">
-              <div className="p-2.5 bg-white border border-[#E2E8F0] rounded flex items-center gap-2">
-                <Ship className="w-4 h-4 text-[#086788] shrink-0" />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-2.5">
+                <Ship className="w-4 h-4 text-blue-600 shrink-0" />
                 <div>
-                  <div className="text-sm font-bold text-[#0F172A]">{activePort.waitingVessels}</div>
-                  <div className="text-[10px] text-[#64748B]">Vessels at Anchor</div>
+                  <div className="text-sm font-bold text-slate-900">{activePort.waitingVessels}</div>
+                  <div className="text-[11px] text-slate-500">Ships at Anchor</div>
                 </div>
               </div>
 
-              <div className="p-2.5 bg-white border border-[#E2E8F0] rounded flex items-center gap-2">
-                <Truck className="w-4 h-4 text-[#D97706] shrink-0" />
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-2.5">
+                <Truck className="w-4 h-4 text-amber-600 shrink-0" />
                 <div>
-                  <div className="text-sm font-bold text-[#0F172A]">{activePort.affectedTrucks}</div>
-                  <div className="text-[10px] text-[#64748B]">Trucks Held / Staged</div>
+                  <div className="text-sm font-bold text-slate-900">{activePort.affectedTrucks}</div>
+                  <div className="text-[11px] text-slate-500">Trucks Staged</div>
                 </div>
               </div>
 
-              <div className="p-2.5 bg-white border border-[#E2E8F0] rounded flex items-center gap-2">
-                <Package className="w-4 h-4 text-[#0D3B66] shrink-0" />
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-2.5">
+                <Package className="w-4 h-4 text-slate-700 shrink-0" />
                 <div>
-                  <div className="text-sm font-bold text-[#0F172A]">{activePort.affectedShipments}</div>
-                  <div className="text-[10px] text-[#64748B]">Active Shipments</div>
+                  <div className="text-sm font-bold text-slate-900">{activePort.affectedShipments}</div>
+                  <div className="text-[11px] text-slate-500">Active Shipments</div>
                 </div>
               </div>
 
-              <div className="p-2.5 bg-red-50 border border-red-200 rounded flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+              <div className="p-3 bg-rose-50 rounded-xl border border-rose-100 flex items-center gap-2.5">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
                 <div>
-                  <div className="text-sm font-bold text-red-700">{activePort.affectedColdChain}</div>
-                  <div className="text-[10px] text-red-600 font-semibold">Cold-Chain Reefer</div>
+                  <div className="text-sm font-bold text-rose-700">{activePort.affectedColdChain}</div>
+                  <div className="text-[11px] text-rose-700 font-medium">Reefers at Risk</div>
                 </div>
               </div>
             </div>
 
-            {/* Inbound Vessel Manifest Preview */}
-            <div className="mt-3 pt-3 border-t border-[#E2E8F0]">
-              <div className="text-[11px] font-bold text-[#0F172A] mb-2 flex items-center justify-between">
-                <span>INBOUND QUEUE PREVIEW:</span>
-                <span className="text-[10px] text-[#64748B]">{inboundVessels.length} Inbound</span>
+            {/* Inbound Vessel Preview */}
+            <div className="pt-2 border-t border-slate-100">
+              <div className="text-xs font-bold text-slate-800 mb-2 flex items-center justify-between">
+                <span>Inbound Vessel Queue:</span>
+                <span className="text-[11px] text-slate-400">{inboundVessels.length} Inbound</span>
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {inboundVessels.map(vessel => (
                   <div 
                     key={vessel.id}
                     onClick={() => onSelectAsset && onSelectAsset({ ...vessel, assetType: 'vessel' })}
-                    className="p-2 bg-white hover:bg-[#F1F5F9] border border-[#E2E8F0] rounded flex items-center justify-between cursor-pointer transition-colors"
+                    className="p-2.5 bg-slate-50 hover:bg-slate-100/80 border border-slate-100 rounded-lg flex items-center justify-between cursor-pointer transition-colors"
                   >
                     <div>
-                      <div className="font-bold text-[#0F172A] flex items-center gap-1.5">
-                        <Ship className="w-3.5 h-3.5 text-[#0D3B66]" />
+                      <div className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                        <Ship className="w-3.5 h-3.5 text-blue-600" />
                         <span>{vessel.name}</span>
                       </div>
-                      <div className="text-[10px] text-[#64748B]">
+                      <div className="text-[11px] text-slate-500">
                         {vessel.cargoTonnage} • ETA {vessel.eta}
                       </div>
                     </div>
-                    <span className="text-xs text-[#94A3B8]">➔</span>
+                    <span className="text-xs text-slate-400">➔</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Impact Trigger */}
+            {/* Simulation Trigger */}
             <button
               onClick={onTriggerImpactView}
-              className="w-full mt-4 py-2 bg-[#0D3B66] hover:bg-[#0A2E50] text-white rounded font-bold text-xs transition-colors shadow-xs"
+              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs transition-colors shadow-xs cursor-pointer"
             >
-              SIMULATE FULL PORT BOTTLENECK CASCADE ➔
+              Simulate Full Bottleneck Cascade ➔
             </button>
           </div>
         </div>

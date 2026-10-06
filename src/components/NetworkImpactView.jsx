@@ -18,8 +18,8 @@ export function NetworkImpactView({ onSelectAsset, onJumpToTab, activeRole = 'al
     setMitigationApplied(true);
     addToast({
       type: 'success',
-      title: '4-LAYER CORRIDOR MITIGATION EXECUTED',
-      message: 'Port berth 04 fast-tracked (+14.5h absorbed), 8 backhaul rigs dispatched (₹336k revenue captured), and aux cold-chain boost active.'
+      title: 'Waypoint Mitigation Executed',
+      message: 'Port berth 04 fast-tracked, 8 backhaul rigs dispatched (₹336k revenue captured), and aux cold-chain boost engaged.'
     });
   };
 
@@ -29,111 +29,115 @@ export function NetworkImpactView({ onSelectAsset, onJumpToTab, activeRole = 'al
   };
 
   return (
-    <div className="bg-white border border-[#CBD5E1] rounded shadow-xs p-3 sm:p-4 flex flex-col h-full overflow-y-auto font-mono text-xs">
-      {/* Signature Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-[#E2E8F0] gap-3">
+    <div className="bg-slate-50/60 p-4 sm:p-6 flex flex-col h-full overflow-y-auto space-y-4">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-slate-200 gap-3">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Activity className="w-5 h-5 text-[#DC2626]" />
-            <h2 className="text-sm sm:text-base font-bold text-[#0F172A] tracking-tight">
-              SIGNATURE DEMONSTRATION • CORRIDOR IMPACT CASCADE
-            </h2>
-            <span className="px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-700 rounded border border-red-200">
-              81% BOTTLENECK SURGE
-            </span>
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-lg bg-rose-50 text-rose-700">
+              <Activity className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+                  Bottleneck Cascade & Network Impact
+                </h1>
+                <span className="px-2.5 py-0.5 text-[10px] font-bold bg-rose-50 text-rose-700 rounded-full border border-rose-200">
+                  81% Peak Surge
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Watch how a single 16-hour port delay ripples through Shipping, Highway Haulage, and Cold-Chain
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-[#64748B] mt-0.5">
-            Single root bottleneck at Visakhapatnam propagating through Sea, Land Fleet, Backhaul, and Cold-Chain
-          </p>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 self-start md:self-auto">
           {mitigationApplied && (
             <button
               onClick={handleReset}
-              className="px-2.5 py-1.5 rounded text-xs font-bold bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#475569] flex items-center gap-1 transition-colors"
+              className="px-3 py-2 rounded-lg text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>RESET SIMULATION</span>
+              <span>Reset</span>
             </button>
           )}
 
           <button
             onClick={handleApplyMitigation}
-            className={`px-3.5 py-1.5 rounded text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all shadow-xs cursor-pointer ${
               mitigationApplied
                 ? 'bg-emerald-700 text-white cursor-default'
-                : 'bg-[#0D3B66] hover:bg-[#0A2E50] text-white'
+                : 'bg-slate-900 hover:bg-slate-800 text-white'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>{mitigationApplied ? '✓ 4-LAYER MITIGATION ACTIVE' : 'EXECUTE WAYPOINT MITIGATION'}</span>
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>{mitigationApplied ? '✓ 4-Tier Mitigation Active' : 'Execute Waypoint Mitigation'}</span>
           </button>
         </div>
       </div>
 
-      {/* Main Cascade Visualization */}
-      <div className="my-3 sm:my-4 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start flex-1">
-        {/* Left: The Multi-Layer Cascade Chain */}
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start flex-1">
+        {/* Left: Cascade Sequence */}
         <div className="lg:col-span-8 space-y-3">
-          <div className="text-[10px] sm:text-xs font-bold text-[#64748B] uppercase tracking-wider mb-2 flex items-center justify-between">
-            <span>UPSTREAM ➔ DOWNSTREAM PROPAGATION SEQUENCE</span>
-            <span className="text-[#0D3B66]">STEP {activeStep + 1} OF {chain.length}</span>
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-700 px-1">
+            <span>PROPAGATION SEQUENCE (CLICK ANY STAGE)</span>
+            <span className="text-blue-700 font-bold">Step {activeStep + 1} of {chain.length}</span>
           </div>
 
-          <div className="space-y-3 relative pl-3 sm:pl-4 border-l-2 border-[#CBD5E1] ml-2 sm:ml-3">
+          <div className="space-y-3 relative pl-5 border-l-2 border-slate-200 ml-2">
             {chain.map((item, index) => {
               const isSelected = activeStep === index;
               const isPast = index < activeStep;
 
               return (
                 <div key={item.level} className="relative">
-                  {/* Step Pin */}
+                  {/* Step Circle */}
                   <div
                     onClick={() => handleStepClick(index)}
-                    className={`absolute -left-[19px] sm:-left-[23px] top-3 w-4 h-4 rounded-full border-2 border-white cursor-pointer transition-all flex items-center justify-center text-[8px] font-bold text-white ${
-                      isSelected ? 'bg-[#DC2626] ring-4 ring-red-100 scale-125' :
-                      isPast ? 'bg-[#0D3B66]' : 'bg-[#94A3B8]'
+                    className={`absolute -left-[27px] top-3.5 w-5 h-5 rounded-full border-2 border-white cursor-pointer transition-all flex items-center justify-center text-[9px] font-bold text-white shadow-xs ${
+                      isSelected ? 'bg-rose-600 ring-4 ring-rose-100 scale-110' :
+                      isPast ? 'bg-slate-900' : 'bg-slate-300'
                     }`}
                   >
                     {item.level}
                   </div>
 
-                  {/* Cascade Card */}
+                  {/* Card */}
                   <div
                     onClick={() => handleStepClick(index)}
-                    className={`p-3.5 sm:p-4 rounded-lg border transition-all cursor-pointer ${
+                    className={`p-4 sm:p-5 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-[#FEF2F2] border-red-300 ring-2 ring-red-200 shadow-xs'
-                        : 'bg-white hover:bg-[#F8F9FA] border-[#CBD5E1]'
+                        ? 'bg-white border-rose-400 shadow-md ring-2 ring-rose-100'
+                        : 'bg-white hover:bg-slate-50 border-slate-200 shadow-2xs'
                     }`}
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold px-1.5 py-0.2 bg-[#F1F5F9] text-[#475569] rounded border border-[#E2E8F0]">
+                          <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md">
                             {item.layer}
                           </span>
-                          <span className="text-xs sm:text-sm font-bold text-[#0F172A]">
+                          <span className="text-sm font-bold text-slate-900">
                             {item.title}
                           </span>
                         </div>
-                        <div className="text-[11px] text-[#DC2626] font-semibold mt-0.5">
+                        <div className="text-xs text-rose-600 font-semibold mt-1">
                           {item.subtext}
                         </div>
                       </div>
 
-                      <div className="text-left sm:text-right shrink-0">
-                        <span className="text-xs font-bold text-[#0F172A] bg-white px-2 py-0.5 rounded border border-[#CBD5E1] shadow-2xs">
-                          {item.primaryMetric}
-                        </span>
-                      </div>
+                      <span className="text-xs font-bold text-slate-900 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100 self-start sm:self-auto">
+                        {item.primaryMetric}
+                      </span>
                     </div>
 
-                    <div className="mt-2 text-xs text-[#475569] leading-relaxed">
+                    <p className="mt-2.5 text-xs text-slate-600 leading-relaxed">
                       {item.details}
-                    </div>
+                    </p>
                   </div>
                 </div>
               );
@@ -141,33 +145,30 @@ export function NetworkImpactView({ onSelectAsset, onJumpToTab, activeRole = 'al
           </div>
         </div>
 
-        {/* Right: Root Cause Analysis & Mitigation Impact Card */}
-        <div className="lg:col-span-4 bg-[#F8F9FA] border border-[#CBD5E1] rounded-lg p-3.5 sm:p-4 text-xs flex flex-col space-y-3.5">
-          <div className="text-[11px] font-bold text-[#0D3B66] uppercase tracking-wider pb-2 border-b border-[#E2E8F0]">
-            INTELLIGENCE SYNTHESIS
+        {/* Right: Synthesis & Solution */}
+        <div className="lg:col-span-4 bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+          <h3 className="text-xs font-bold text-slate-900 uppercase pb-2 border-b border-slate-100">
+            Intelligence Synthesis
+          </h3>
+
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-700 space-y-2">
+            <div className="font-bold text-slate-900">The Problem with Freight Silos:</div>
+            <p className="leading-relaxed text-[11px] text-slate-600">
+              When a port experiences sudden congestion, shipping lines, highway truckers, and cold storage warehouses usually find out hours too late — leading to spoiled cargo and wasted truck fuel.
+            </p>
           </div>
 
-          <div className="p-3 bg-white border border-[#CBD5E1] rounded space-y-2">
-            <div className="text-[10px] text-[#64748B] uppercase font-bold">WHY WAYPOINT EXISTS:</div>
-            <div className="text-xs text-[#0F172A] leading-normal font-semibold">
-              Traditional logistics software treats Shipping, Seaports, Trucking, and Cold Stores as 4 disconnected silos.
-            </div>
-            <div className="text-[11px] text-[#475569] leading-relaxed">
-              WAYPOINT unifies them on a <strong>single shared route graph</strong>. When a vessel slows down, the entire hinterland truck schedule and cold chain automatically re-calibrates in real time.
-            </div>
-          </div>
-
-          {/* Mitigation Results comparison */}
+          {/* Mitigation Comparison */}
           {mitigationApplied ? (
-            <div className="p-3 bg-emerald-50 border border-emerald-300 rounded space-y-2 text-emerald-900">
-              <div className="font-bold flex items-center gap-1.5 text-xs text-emerald-800">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>WAYPOINT MITIGATION ACTIVE:</span>
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-950 space-y-2.5 text-xs">
+              <div className="font-bold flex items-center gap-2 text-emerald-800">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Waypoint AI Mitigation Active</span>
               </div>
-              <div className="space-y-1 text-[11px]">
+              <div className="space-y-1.5 text-[11px]">
                 <div className="flex justify-between">
                   <span>Port Dwell Absorbed:</span>
-                  <span className="font-bold">+14.5h scheduled ahead</span>
+                  <span className="font-bold text-emerald-800">+14.5h scheduled ahead</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Backhaul Revenue Captured:</span>
@@ -184,26 +185,26 @@ export function NetworkImpactView({ onSelectAsset, onJumpToTab, activeRole = 'al
               </div>
             </div>
           ) : (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded text-amber-900 text-[11px]">
-              <div className="font-bold mb-1">WITHOUT WAYPOINT:</div>
-              <div className="leading-relaxed">
-                Rigs arrive blindly at congested gates, spend 16 hours idling, empty trucks return deadhead with zero revenue, and sensitive cold pharma spoil without prior notification.
-              </div>
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs space-y-1.5">
+              <div className="font-bold">Without Waypoint:</div>
+              <p className="text-[11px] leading-relaxed">
+                Trucks arrive blindly at congested gates, spend 16 hours idling, empty trucks return without cargo, and sensitive pharma spoils.
+              </p>
             </div>
           )}
 
-          <div className="pt-2 border-t border-[#E2E8F0] space-y-2">
+          <div className="space-y-2 pt-2 border-t border-slate-100">
             <button
               onClick={() => onJumpToTab('graph')}
-              className="w-full py-2 bg-white hover:bg-[#F1F5F9] border border-[#CBD5E1] text-[#0D3B66] rounded font-bold text-xs transition-colors"
+              className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 rounded-lg font-semibold text-xs transition-colors cursor-pointer"
             >
-              EXPLORE SHARED GRAPH NODES ➔
+              Explore Connected Route Graph ➔
             </button>
             <button
               onClick={() => onJumpToTab('backhaul')}
-              className="w-full py-2 bg-white hover:bg-[#F1F5F9] border border-[#CBD5E1] text-[#059669] rounded font-bold text-xs transition-colors"
+              className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 rounded-lg font-semibold text-xs transition-colors cursor-pointer"
             >
-              DISPATCH BACKHAUL MATCHES ➔
+              View Backhaul Matches ➔
             </button>
           </div>
         </div>

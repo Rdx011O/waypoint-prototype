@@ -9,13 +9,9 @@ import {
   Repeat, 
   Package, 
   ArrowRight, 
-  ExternalLink, 
-  ShieldAlert,
-  ThermometerSnowflake,
-  FileText,
-  Clock,
   CheckCircle2,
-  Sparkles
+  ThermometerSnowflake,
+  ExternalLink
 } from 'lucide-react';
 import { useToast } from './ToastNotification';
 
@@ -36,99 +32,93 @@ export function ContextPanel({ selectedAsset, onClose, onTriggerImpactView, onJu
   const handleRequestPriority = (shipmentId) => {
     addToast({
       type: 'success',
-      title: 'FAST-TRACK DISPATCHED',
-      message: `Priority terminal gate pass & reefer plug-in staged for ${shipmentId}.`
+      title: 'Fast-Track Pass Dispatched',
+      message: `Priority terminal gate pass staged for ${shipmentId}.`
     });
   };
 
   return (
-    <aside className="w-full md:w-80 lg:w-96 bg-white border-l border-[#CBD5E1] flex flex-col h-full z-20 shrink-0 shadow-lg md:shadow-none font-mono">
-      {/* Drawer Header */}
-      <div className="p-3 bg-[#F8F9FA] border-b border-[#E2E8F0] flex items-center justify-between shrink-0">
+    <aside className="w-full md:w-80 lg:w-96 bg-white border-l border-slate-200 flex flex-col h-full z-20 shrink-0 shadow-lg md:shadow-none">
+      {/* Header */}
+      <div className="p-4 bg-white border-b border-slate-100 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          {type === 'shipment' && <Package className="w-4 h-4 text-[#0284C7]" />}
-          {type === 'port' && <Anchor className="w-4 h-4 text-[#DC2626]" />}
-          {type === 'vessel' && <Ship className="w-4 h-4 text-[#086788]" />}
-          {type === 'truck' && <Truck className="w-4 h-4 text-[#D97706]" />}
-          {type === 'warehouse' && <Building2 className="w-4 h-4 text-[#059669]" />}
+          {type === 'shipment' && <Package className="w-4 h-4 text-blue-600" />}
+          {type === 'port' && <Anchor className="w-4 h-4 text-rose-600" />}
+          {type === 'vessel' && <Ship className="w-4 h-4 text-sky-600" />}
+          {type === 'truck' && <Truck className="w-4 h-4 text-emerald-600" />}
+          {type === 'warehouse' && <Building2 className="w-4 h-4 text-teal-600" />}
           
-          <span className="text-[11px] font-bold text-[#0F172A] uppercase">
-            INSPECTOR • {type}
+          <span className="text-xs font-bold text-slate-900 uppercase">
+            Inspector: {type}
           </span>
         </div>
 
         <button
           onClick={onClose}
-          className="p-1 text-[#64748B] hover:text-[#0F172A] hover:bg-[#E2E8F0] rounded transition-colors"
-          title="Close Inspector"
+          className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+          title="Close Panel"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Drawer Body Content */}
-      <div className="p-4 flex-1 overflow-y-auto space-y-4 text-xs">
+      {/* Body Content */}
+      <div className="p-5 flex-1 overflow-y-auto space-y-4 text-xs">
         {/* SHIPMENT CONTEXT */}
         {type === 'shipment' && (
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             <div>
-              <div className="text-[10px] text-[#64748B] uppercase">CARGO CONSIGNMENT</div>
-              <div className="text-base font-bold text-[#0F172A] leading-tight mt-0.5">
+              <span className="text-[10px] text-slate-400 font-semibold uppercase">Cargo Consignment</span>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-tight mt-0.5">
                 {selectedAsset.product || 'Consignment Package'}
-              </div>
-              <div className="text-[11px] text-[#475569] mt-1">
+              </h2>
+              <div className="text-xs text-slate-500 mt-1">
                 ID: <strong>{selectedAsset.id}</strong> • Container: <strong>{selectedAsset.containerId}</strong>
               </div>
             </div>
 
-            {/* Status / Exception Pill */}
             {selectedAsset.hasException ? (
-              <div className="p-3 bg-red-50 border border-red-200 rounded text-red-900 space-y-1.5">
-                <div className="font-bold flex items-center gap-1.5 text-xs text-red-700">
-                  <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                  <span>{selectedAsset.statusLabel || 'ACTIVE EXCEPTION'}</span>
+              <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-slate-800 space-y-1.5">
+                <div className="font-bold flex items-center gap-1.5 text-xs text-rose-700">
+                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{selectedAsset.statusLabel}</span>
                 </div>
-                <div className="text-[11px] text-red-800 leading-normal">
-                  {selectedAsset.exceptionReason || 'Cascade delay due to corridor congestion.'}
-                </div>
-                <div className="text-[10px] text-red-700 font-bold">
-                  CASCADE DELAY: {selectedAsset.delayHours || '+13.0h'}
+                <p className="text-[11px] text-slate-700 leading-relaxed">
+                  {selectedAsset.exceptionReason}
+                </p>
+                <div className="text-[11px] text-rose-700 font-bold">
+                  Cascade Delay: {selectedAsset.delayHours}
                 </div>
               </div>
             ) : (
-              <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded text-emerald-900 flex items-center justify-between">
-                <span className="font-bold flex items-center gap-1.5 text-[11px]">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  ON SCHEDULE
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 flex items-center justify-between">
+                <span className="font-bold flex items-center gap-1.5 text-xs">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  On Schedule
                 </span>
-                <span className="text-[10px] font-bold text-emerald-700">NORMAL FLOW</span>
+                <span className="text-[10px] font-bold text-emerald-700">Normal Flow</span>
               </div>
             )}
 
-            {/* Telemetry & Route Details */}
-            <div className="p-3 bg-[#F8F9FA] border border-[#CBD5E1] rounded space-y-2">
-              <div className="text-[10px] font-bold text-[#0D3B66] uppercase">CONSIGNMENT PROFILE:</div>
-              <div className="space-y-1.5 text-[11px]">
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 space-y-2">
+              <div className="text-[10px] font-bold text-slate-400 uppercase">Consignment Profile</div>
+              <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-[#64748B]">Consignee:</span>
-                  <span className="font-bold text-[#0F172A] truncate max-w-[170px]">{selectedAsset.consignee}</span>
+                  <span className="text-slate-500">Consignee:</span>
+                  <span className="font-bold text-slate-900 truncate max-w-[160px]">{selectedAsset.consignee}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#64748B]">Cargo Value:</span>
-                  <span className="font-bold text-[#0D3B66]">{selectedAsset.cargoValue || '₹4.85 Crore'}</span>
+                  <span className="text-slate-500">Cargo Value:</span>
+                  <span className="font-bold text-blue-700">{selectedAsset.cargoValue || '₹4.85 Crore'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#64748B]">Current Milestone:</span>
-                  <span className="font-bold text-[#0F172A] truncate max-w-[160px]">{selectedAsset.currentMilestone}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#64748B]">Customs Filing:</span>
-                  <span className="font-bold text-[#059669]">{selectedAsset.customsStatus || 'CLEARED'}</span>
+                  <span className="text-slate-500">Customs Clearance:</span>
+                  <span className="font-bold text-emerald-700">{selectedAsset.customsStatus || 'Cleared'}</span>
                 </div>
                 {selectedAsset.currentTemp && (
                   <div className="flex justify-between">
-                    <span className="text-[#64748B]">Reefer Core Temp:</span>
-                    <span className={`font-bold ${selectedAsset.hasException ? 'text-red-600' : 'text-[#059669]'}`}>
+                    <span className="text-slate-500">Reefer Core Temp:</span>
+                    <span className={`font-bold ${selectedAsset.hasException ? 'text-rose-600' : 'text-emerald-700'}`}>
                       {selectedAsset.currentTemp}
                     </span>
                   </div>
@@ -136,92 +126,83 @@ export function ContextPanel({ selectedAsset, onClose, onTriggerImpactView, onJu
               </div>
             </div>
 
-            {/* ETA Comparison */}
             <div className="grid grid-cols-2 gap-2 text-center">
-              <div className="p-2 bg-white border border-[#CBD5E1] rounded">
-                <div className="text-[9.5px] text-[#64748B]">ORIGINAL SLA</div>
-                <div className="font-bold text-[#0F172A] text-xs mt-0.5">{selectedAsset.originalEta}</div>
+              <div className="p-2.5 bg-white border border-slate-200 rounded-xl">
+                <div className="text-[10px] text-slate-400 font-medium">PLANNED SLA</div>
+                <div className="font-bold text-slate-900 text-xs mt-0.5">{selectedAsset.originalEta}</div>
               </div>
-              <div className="p-2 bg-[#F0F7FF] border border-[#BFDBFE] rounded">
-                <div className="text-[9.5px] text-[#1E40AF] font-bold">DYNAMIC ETA</div>
-                <div className={`font-bold text-xs mt-0.5 ${selectedAsset.hasException ? 'text-red-700' : 'text-[#059669]'}`}>
+              <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-xl">
+                <div className="text-[10px] text-blue-700 font-bold">DYNAMIC ETA</div>
+                <div className={`font-bold text-xs mt-0.5 ${selectedAsset.hasException ? 'text-rose-700' : 'text-emerald-700'}`}>
                   {selectedAsset.dynamicPredictedEta}
                 </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-2 pt-1">
-              <button
-                onClick={() => handleRequestPriority(selectedAsset.id)}
-                className="w-full py-2 bg-[#0D3B66] hover:bg-[#0A2E50] text-white rounded font-bold text-xs transition-colors shadow-xs"
-              >
-                REQUEST FAST-TRACK YARD STAGING ➔
-              </button>
+            <button
+              onClick={() => handleRequestPriority(selectedAsset.id)}
+              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs transition-colors shadow-xs cursor-pointer"
+            >
+              Request Priority Yard Fast-Track ➔
+            </button>
 
-              <button
-                onClick={() => onJumpToTab && onJumpToTab('shipments')}
-                className="w-full py-2 bg-white hover:bg-[#F8F9FA] border border-[#CBD5E1] text-[#0F172A] rounded font-bold text-xs transition-colors"
-              >
-                OPEN FULL CARGO OWNER DASHBOARD
-              </button>
-            </div>
+            <button
+              onClick={() => onJumpToTab && onJumpToTab('shipments')}
+              className="w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg font-semibold text-xs transition-colors cursor-pointer"
+            >
+              Open Full Shipment Tracker
+            </button>
           </div>
         )}
 
         {/* PORT CONTEXT */}
         {type === 'port' && (
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             <div>
-              <div className="text-[10px] text-[#64748B]">PORT TERMINAL</div>
-              <div className="text-base font-bold text-[#0F172A]">{selectedAsset.name}</div>
-              <div className="text-[11px] text-[#475569]">{selectedAsset.code} • {selectedAsset.channelStatus}</div>
+              <span className="text-[10px] text-slate-400 font-semibold uppercase">Seaport Terminal</span>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 mt-0.5">{selectedAsset.name}</h2>
+              <div className="text-xs text-slate-500">{selectedAsset.code} • {selectedAsset.channelStatus}</div>
             </div>
 
-            <div className="p-3 bg-red-50 border border-red-200 rounded">
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl">
               <div className="flex justify-between items-center">
-                <span className="text-[10px] font-bold text-red-800">CURRENT CONGESTION:</span>
-                <span className="text-sm font-bold text-red-700">{selectedAsset.congestion}%</span>
+                <span className="text-xs font-bold text-rose-800">Current Congestion:</span>
+                <span className="text-base font-bold text-rose-700">{selectedAsset.congestion}%</span>
               </div>
-              <div className="grid grid-cols-3 gap-1 mt-2 text-center text-[10px] pt-2 border-t border-red-200/60">
+              <div className="grid grid-cols-3 gap-1 mt-2.5 pt-2 border-t border-rose-100 text-center text-xs">
                 <div>
-                  <div className="text-[#64748B]">+24H</div>
-                  <div className="font-bold text-[#0F172A]">{selectedAsset.forecast?.h24 || 71}%</div>
+                  <div className="text-slate-400 text-[10px]">+24H</div>
+                  <div className="font-bold text-slate-800">{selectedAsset.forecast?.h24 || 71}%</div>
                 </div>
                 <div>
-                  <div className="text-red-700 font-bold">+48H PEAK</div>
-                  <div className="font-bold text-red-700">{selectedAsset.forecast?.h48 || 81}%</div>
+                  <div className="text-rose-700 font-bold text-[10px]">+48H PEAK</div>
+                  <div className="font-bold text-rose-700">{selectedAsset.forecast?.h48 || 81}%</div>
                 </div>
                 <div>
-                  <div className="text-[#64748B]">+72H</div>
-                  <div className="font-bold text-[#0F172A]">{selectedAsset.forecast?.h72 || 67}%</div>
+                  <div className="text-slate-400 text-[10px]">+72H</div>
+                  <div className="font-bold text-slate-800">{selectedAsset.forecast?.h72 || 67}%</div>
                 </div>
               </div>
             </div>
 
-            {/* Operational Impact Breakdown */}
-            <div className="p-3 bg-[#F8F9FA] border border-[#CBD5E1] rounded space-y-2">
-              <div className="text-[10px] font-bold text-[#0D3B66] uppercase">AFFECTED NETWORK:</div>
-              <div className="space-y-1.5 text-[11px]">
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 space-y-2">
+              <div className="text-[10px] font-bold text-slate-400 uppercase">Impact on Network</div>
+              <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-[#64748B]">Waiting Vessels:</span>
-                  <span className="font-bold text-[#0F172A]">{selectedAsset.waitingVessels || 7}</span>
+                  <span className="text-slate-500">Ships Waiting:</span>
+                  <span className="font-bold text-slate-900">{selectedAsset.waitingVessels || 7}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#64748B]">Expected Turnaround Dwell:</span>
-                  <span className="font-bold text-[#0F172A]">{selectedAsset.expectedDwellHours || 16}h</span>
+                  <span className="text-slate-500">Avg Dwell Time:</span>
+                  <span className="font-bold text-slate-900">{selectedAsset.expectedDwellHours || 16}h</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#64748B]">Affected Land Trucks:</span>
-                  <span className="font-bold text-[#D97706]">{selectedAsset.affectedTrucks || 26}</span>
+                  <span className="text-slate-500">Trucks Staged:</span>
+                  <span className="font-bold text-amber-600">{selectedAsset.affectedTrucks || 26}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#64748B]">Affected Shipments:</span>
-                  <span className="font-bold text-[#0F172A]">{selectedAsset.affectedShipments || 11}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-red-600 font-bold">Affected Cold-Chain:</span>
-                  <span className="font-bold text-red-700">{selectedAsset.affectedColdChain || 3}</span>
+                  <span className="text-slate-500">Reefers at Risk:</span>
+                  <span className="font-bold text-rose-600">{selectedAsset.affectedColdChain || 3}</span>
                 </div>
               </div>
             </div>
@@ -230,151 +211,87 @@ export function ContextPanel({ selectedAsset, onClose, onTriggerImpactView, onJu
               onClick={() => {
                 if (onTriggerImpactView) onTriggerImpactView();
               }}
-              className="w-full py-2.5 bg-[#0D3B66] hover:bg-[#0A2E50] text-white rounded font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
             >
-              <span>VIEW BOTTLENECK IMPACT CASCADE</span>
+              <span>Simulate Bottleneck Impact</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-
-            <button
-              onClick={() => onJumpToTab && onJumpToTab('ports')}
-              className="w-full py-2 bg-white hover:bg-[#F8F9FA] border border-[#CBD5E1] text-[#0F172A] rounded font-bold text-xs transition-colors"
-            >
-              OPEN PORT BERTH INTELLIGENCE ➔
             </button>
           </div>
         )}
 
         {/* VESSEL CONTEXT */}
         {type === 'vessel' && (
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             <div>
-              <div className="text-[10px] text-[#64748B]">AIS VESSEL CARRIER</div>
-              <div className="text-base font-bold text-[#0F172A]">{selectedAsset.name}</div>
-              <div className="text-[11px] text-[#475569]">{selectedAsset.imo} • {selectedAsset.type}</div>
+              <span className="text-[10px] text-slate-400 font-semibold uppercase">AIS Container Carrier</span>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 mt-0.5">{selectedAsset.name}</h2>
+              <div className="text-xs text-slate-500">{selectedAsset.imo} • {selectedAsset.type}</div>
             </div>
 
-            <div className="p-2.5 bg-[#F8F9FA] border border-[#CBD5E1] rounded space-y-1.5 text-[11px]">
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Destination Port:</span>
-                <span className="font-bold text-[#0D3B66]">{selectedAsset.destination}</span>
+                <span className="text-slate-500">Destination Seaport:</span>
+                <span className="font-bold text-blue-700">{selectedAsset.destination}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#64748B]">ETA at Pilot:</span>
-                <span className="font-bold text-[#0F172A]">{selectedAsset.eta}</span>
+                <span className="text-slate-500">ETA at Pilot Station:</span>
+                <span className="font-bold text-slate-900">{selectedAsset.eta}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Speed / Heading:</span>
-                <span className="font-bold text-[#0F172A]">{selectedAsset.speed} • {selectedAsset.heading}°</span>
+                <span className="text-slate-500">Speed / Heading:</span>
+                <span className="font-bold text-slate-900">{selectedAsset.speed} • {selectedAsset.heading}°</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Draught / LOA:</span>
-                <span className="font-bold text-[#0F172A]">{selectedAsset.draftMeters || 14.5}m / {selectedAsset.lengthMeters || 366}m</span>
+                <span className="text-slate-500">Capacity:</span>
+                <span className="font-bold text-slate-900">{selectedAsset.cargoTonnage}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-[#64748B]">Cargo Tonnage:</span>
-                <span className="font-bold text-[#0F172A]">{selectedAsset.cargoTonnage}</span>
-              </div>
-            </div>
-
-            <div className="p-2.5 bg-amber-50 border border-amber-200 rounded text-[11px] text-amber-900">
-              <div className="font-bold">BERTH QUEUE PREDICTION:</div>
-              <div className="mt-0.5">{selectedAsset.predictedBerth || 'Berth 02 Queue (+14.5h delay)'}</div>
             </div>
 
             <button
               onClick={() => onJumpToTab && onJumpToTab('vessels')}
-              className="w-full py-2 bg-[#0D3B66] hover:bg-[#0A2E50] text-white rounded font-bold text-xs transition-colors shadow-xs"
+              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs transition-colors shadow-xs cursor-pointer"
             >
-              OPEN FULL VESSEL TIMING RECORD ➔
+              View Full Vessel Timing Record ➔
             </button>
           </div>
         )}
 
         {/* TRUCK CONTEXT */}
         {type === 'truck' && (
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             <div>
-              <div className="text-[10px] text-[#64748B]">HAULAGE RIG</div>
-              <div className="text-base font-bold text-[#0F172A]">{selectedAsset.id}</div>
-              <div className="text-[11px] text-[#475569]">{selectedAsset.type}</div>
+              <span className="text-[10px] text-slate-400 font-semibold uppercase">Highway Transport Rig</span>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 mt-0.5">{selectedAsset.id}</h2>
+              <div className="text-xs text-slate-500">{selectedAsset.type}</div>
             </div>
 
-            <div className="p-2.5 bg-[#F8F9FA] border border-[#CBD5E1] rounded space-y-1.5 text-[11px]">
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Status:</span>
-                <span className="font-bold text-[#0F172A]">{selectedAsset.statusLabel}</span>
+                <span className="text-slate-500">Status:</span>
+                <span className="font-bold text-slate-900">{selectedAsset.statusLabel}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Current Location:</span>
-                <span className="font-bold text-[#0F172A]">{selectedAsset.currentLocation}</span>
+                <span className="text-slate-500">Driver:</span>
+                <span className="font-bold text-slate-900">{selectedAsset.driver} ({selectedAsset.phone})</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#64748B]">Driver:</span>
-                <span className="font-bold text-[#0F172A]">{selectedAsset.driver} ({selectedAsset.phone})</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#64748B]">Capacity:</span>
-                <span className="font-bold text-[#0F172A]">{selectedAsset.capacityTons} MT</span>
+                <span className="text-slate-500">Current Location:</span>
+                <span className="font-bold text-slate-900">{selectedAsset.currentLocation}</span>
               </div>
             </div>
 
             {selectedAsset.hasBackhaulMatch && (
-              <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded text-[11px] text-emerald-900">
-                <div className="font-bold">BACKHAUL MATCH AVAILABLE:</div>
-                <div className="mt-0.5">94% Match • 612 KM Deadhead Avoided • ₹42,000 Rev</div>
+              <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-950 text-xs space-y-1.5">
+                <div className="font-bold">94% Backhaul Match Available</div>
+                <div className="text-[11px] text-emerald-800">612 KM deadhead eliminated • ₹42,000 revenue recovery</div>
                 <button
                   onClick={() => onJumpToTab && onJumpToTab('backhaul')}
-                  className="mt-2 w-full py-1.5 bg-[#059669] hover:bg-[#047857] text-white rounded font-bold text-[11px] transition-colors"
+                  className="mt-2 w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs transition-colors cursor-pointer"
                 >
-                  ASSIGN BACKHAUL LOAD ➔
+                  Assign Backhaul Freight ➔
                 </button>
               </div>
             )}
-
-            <button
-              onClick={() => onJumpToTab && onJumpToTab('fleet')}
-              className="w-full py-2 bg-[#0D3B66] hover:bg-[#0A2E50] text-white rounded font-bold text-xs transition-colors"
-            >
-              OPEN FLEET DISPATCH BOARD ➔
-            </button>
-          </div>
-        )}
-
-        {/* WAREHOUSE CONTEXT */}
-        {type === 'warehouse' && (
-          <div className="space-y-3">
-            <div>
-              <div className="text-[10px] text-[#64748B]">INLAND LOGISTICS HUB</div>
-              <div className="text-base font-bold text-[#0F172A]">{selectedAsset.name}</div>
-              <div className="text-[11px] text-[#475569]">{selectedAsset.type}</div>
-            </div>
-
-            <div className="p-2.5 bg-[#F8F9FA] border border-[#CBD5E1] rounded space-y-1.5 text-[11px]">
-              <div className="flex justify-between">
-                <span className="text-[#64748B]">Capacity Utilized:</span>
-                <span className="font-bold text-[#0F172A]">{selectedAsset.capacityUtilized}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#64748B]">Active Inbound:</span>
-                <span className="font-bold text-[#0D3B66]">{selectedAsset.activeInbound} Rigs</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#64748B]">Active Outbound:</span>
-                <span className="font-bold text-[#059669]">{selectedAsset.activeOutbound} Rigs</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#64748B]">Cold Chambers:</span>
-                <span className="font-bold text-[#0F172A]">{selectedAsset.coldStorageZones}</span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => onJumpToTab && onJumpToTab('graph')}
-              className="w-full py-2 bg-[#0D3B66] hover:bg-[#0A2E50] text-white rounded font-bold text-xs transition-colors"
-            >
-              VIEW CORRIDOR ROUTE GRAPH ➔
-            </button>
           </div>
         )}
       </div>

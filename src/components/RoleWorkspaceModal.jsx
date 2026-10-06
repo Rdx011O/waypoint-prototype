@@ -10,49 +10,49 @@ export function RoleWorkspaceModal({ isOpen, onClose, activeRole, onSelectRole }
   const roles = [
     {
       id: 'all',
-      title: 'CONTROL TOWER (ALL CORRIDORS)',
-      sub: 'Panoramic multi-modal view across Sea Passage, Seaports, Highway Rigs, and Receiving Hubs.',
+      title: 'Unified Control Tower',
+      sub: 'See the full panoramic view connecting ships in the Bay of Bengal, seaport berths, highway trucks, and warehouses.',
       icon: Layers,
-      color: '#0D3B66',
-      badge: 'UNIFIED VIEW',
-      features: ['Full GIS Nautical Radar', 'Shared Route Graph', 'Bottleneck Cascade Simulation', 'Cross-Corridor KPIs']
+      color: 'text-sky-600 bg-sky-50',
+      badge: 'All Corridors',
+      highlights: ['Interactive GIS Map', 'Shared Route Graph', 'Bottleneck Cascade Simulation']
     },
     {
       id: 'cargo_owner',
-      title: 'CARGO OWNER / IMPORTER',
-      sub: 'My Shipments, container dwell surveillance, dynamic predicted ETA, and active exception alerts.',
+      title: 'Cargo Owner & Importer',
+      sub: 'Focus on your active consignments, container dwell times, delivery SLAs, and one-click priority yard passes.',
       icon: Package,
-      color: '#0284C7',
-      badge: 'CONTAINER TRACKING',
+      color: 'text-blue-600 bg-blue-50',
+      badge: 'Importer Portal',
       highlight: true,
-      features: ['Active Consignments Feed', 'Dynamic ETA vs SLA', 'Customs Gate Pass Clearance', 'One-Click Fast-Track']
+      highlights: ['Active Consignments (4)', 'Dynamic Predicted ETAs', 'Customs Bill of Entry Records']
     },
     {
       id: 'port',
-      title: 'PORT OPERATIONS & BERTH INTELLIGENCE',
-      sub: 'Outer anchorage queues, berth utilization (B-01 to B-06), 72-hour congestion forecasts.',
+      title: 'Port Operations & Berths',
+      sub: 'Surveil outer anchorage queues, berth capacity (B-01 to B-06), and 72-hour congestion forecasts.',
       icon: Anchor,
-      color: '#DC2626',
-      badge: '81% PEAK SURGE',
-      features: ['Anchorage Dwell Radar', 'Berth Assignment Control', '72h Congestion Curve', 'Downstream Truck Queue']
+      color: 'text-rose-600 bg-rose-50',
+      badge: 'Port Ops',
+      highlights: ['72h Peak Forecast (81%)', 'Berth Assignment Control', 'Anchorage Vessel Queue']
     },
     {
       id: 'fleet',
-      title: 'FLEET DISPATCH & BACKHAUL ENGINE',
-      sub: 'Empty truck turnaround, deadhead elimination, load matching, and highway driver telemetry.',
+      title: 'Fleet Dispatch & Backhaul',
+      sub: 'Monitor highway trucks, match empty return legs to new loads, and eliminate costly deadhead miles.',
       icon: Truck,
-      color: '#059669',
-      badge: '11 ACTIVE MATCHES',
-      features: ['Highway Rig Telemetry', 'Deadhead Elimination (KM)', 'Revenue Recovery Payouts', 'Driver Status Feed']
+      color: 'text-emerald-600 bg-emerald-50',
+      badge: 'Trucking Engine',
+      highlights: ['184 Active Rigs', '11 Backhaul Load Matches', '4,896 KM Empty Miles Saved']
     },
     {
       id: 'coldchain',
-      title: 'COLD-CHAIN SURVEILLANCE & REEFER CONTROL',
-      sub: 'Sensitive biologics & vaccines, real-time IoT temperature graphs, compressor alarms.',
+      title: 'Cold-Chain Surveillance',
+      sub: 'Track real-time temperature telemetry curves for pharma biologics and vaccines, with emergency aux boost controls.',
       icon: ThermometerSnowflake,
-      color: '#086788',
-      badge: '1 CRITICAL EXCURSION',
-      features: ['Live Sensor Telemetry Curve', 'Safe Temp Range [2°-8°C]', 'Compressor Duty Cycle', 'Aux Emergency Boost']
+      color: 'text-teal-600 bg-teal-50',
+      badge: 'Reefer IoT',
+      highlights: ['Real-Time Temp Curves [2°-8°C]', 'Compressor Duty Cycle', 'Auxiliary Cooling Boost']
     }
   ];
 
@@ -61,54 +61,35 @@ export function RoleWorkspaceModal({ isOpen, onClose, activeRole, onSelectRole }
     onClose();
     addToast({
       type: 'info',
-      title: 'WORKSPACE SWITCHED',
-      message: `Active persona changed to ${roleTitle}. Data and KPIs filtered accordingly.`
+      title: 'Workspace Changed',
+      message: `Now viewing as ${roleTitle}. Data and views adapted.`
     });
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0F172A]/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 font-mono">
-      <div className="bg-white border border-[#CBD5E1] rounded-lg max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        {/* Header */}
-        <div className="p-4 bg-[#0F172A] text-white border-b border-[#334155] flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded bg-[#0D3B66] text-[#38BDF8] border border-[#38BDF8]/40 flex items-center justify-center font-bold text-xs">
-              WP
-            </div>
-            <div>
-              <div className="font-bold text-sm sm:text-base text-white flex items-center gap-2">
-                <span>SELECT OPERATIONAL ROLE PERSONA</span>
-              </div>
-              <div className="text-[11px] text-[#94A3B8]">
-                Customizes navigation, metrics, and data displays for each stakeholder
-              </div>
-            </div>
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-white border border-slate-200 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        {/* Modal Header */}
+        <div className="p-5 bg-white border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold text-slate-900">
+              Select Your Role Workspace
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Choose your perspective to tailor the screens, metrics, and alerts
+            </p>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 text-[#94A3B8] hover:text-white hover:bg-[#1E293B] rounded transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Corridor Signature Ribbon */}
-        <div className="px-4 py-2.5 bg-[#F8F9FA] border-b border-[#E2E8F0] flex items-center justify-between text-xs">
-          <span className="text-[#64748B] text-[11px]">Active Corridor: <strong>East Coast Multi-Modal Spine</strong></span>
-          <div className="flex items-center gap-1.5 text-[9px] font-bold text-[#475569]">
-            <span className="px-1.5 py-0.5 bg-white rounded border border-[#CBD5E1]">SEA</span>
-            <span>➔</span>
-            <span className="px-1.5 py-0.5 bg-white rounded border border-[#CBD5E1]">PORT</span>
-            <span>➔</span>
-            <span className="px-1.5 py-0.5 bg-white rounded border border-[#CBD5E1]">LAND</span>
-            <span>➔</span>
-            <span className="px-1.5 py-0.5 bg-white rounded border border-[#CBD5E1]">WAREHOUSE</span>
-          </div>
-        </div>
-
         {/* Roles List */}
-        <div className="p-4 space-y-2.5 overflow-y-auto flex-1">
+        <div className="p-5 space-y-3 overflow-y-auto flex-1">
           {roles.map((role) => {
             const Icon = role.icon;
             const isSelected = activeRole === role.id;
@@ -117,53 +98,45 @@ export function RoleWorkspaceModal({ isOpen, onClose, activeRole, onSelectRole }
               <div
                 key={role.id}
                 onClick={() => handleRoleClick(role.id, role.title)}
-                className={`p-3.5 rounded-lg border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                   isSelected
-                    ? 'bg-[#F0F7FF] border-[#0D3B66] ring-2 ring-[#0D3B66] shadow-sm'
-                    : role.highlight ? 'bg-[#FAFCFF] hover:bg-[#F0F7FF] border-[#BFDBFE]' : 'bg-white hover:bg-[#F8F9FA] border-[#CBD5E1]'
+                    ? 'bg-blue-50/50 border-blue-600 ring-2 ring-blue-100 shadow-xs'
+                    : 'bg-white hover:bg-slate-50/80 border-slate-200'
                 }`}
               >
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded bg-[#F1F5F9] border border-[#E2E8F0] shrink-0 mt-0.5">
-                    <Icon className="w-5 h-5 text-[#0D3B66]" />
+                <div className="flex items-start gap-3.5">
+                  <div className={`p-2.5 rounded-xl shrink-0 mt-0.5 ${role.color}`}>
+                    <Icon className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-bold text-xs sm:text-sm text-[#0F172A]">{role.title}</span>
-                      {role.badge && (
-                        <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold ${
-                          role.id === 'coldchain' ? 'bg-red-100 text-red-700 border border-red-200' :
-                          role.id === 'port' ? 'bg-red-100 text-red-700 border border-red-200' :
-                          role.id === 'fleet' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' :
-                          'bg-[#F1F5F9] text-[#475569] border border-[#CBD5E1]'
-                        }`}>
-                          {role.badge}
-                        </span>
-                      )}
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-slate-900">{role.title}</span>
+                      <span className="text-[10px] font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">
+                        {role.badge}
+                      </span>
                     </div>
-                    <div className="text-[11px] text-[#64748B] mt-0.5">
+                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                       {role.sub}
-                    </div>
+                    </p>
 
-                    {/* Feature Chips */}
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {role.features.map((feat, fIdx) => (
-                        <span key={fIdx} className="text-[9.5px] px-1.5 py-0.2 bg-white text-[#475569] border border-[#E2E8F0] rounded">
-                          ✓ {feat}
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {role.highlights.map((h, i) => (
+                        <span key={i} className="text-[10px] text-slate-500 bg-slate-100/70 px-2 py-0.5 rounded">
+                          ✓ {h}
                         </span>
                       ))}
                     </div>
                   </div>
                 </div>
 
-                <div className="shrink-0 flex items-center justify-end">
+                <div className="shrink-0 flex items-center justify-end sm:justify-center">
                   {isSelected ? (
-                    <span className="px-2.5 py-1 rounded bg-[#0D3B66] text-white flex items-center gap-1 text-xs font-bold shadow-2xs">
-                      <Check className="w-3.5 h-3.5" /> ACTIVE
+                    <span className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs">
+                      <Check className="w-3.5 h-3.5" /> Selected
                     </span>
                   ) : (
-                    <span className="px-2.5 py-1 rounded bg-[#F1F5F9] hover:bg-[#0D3B66] hover:text-white text-[#475569] text-xs font-bold transition-colors">
-                      SWITCH ➔
+                    <span className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-colors">
+                      Switch ➔
                     </span>
                   )}
                 </div>
@@ -172,14 +145,14 @@ export function RoleWorkspaceModal({ isOpen, onClose, activeRole, onSelectRole }
           })}
         </div>
 
-        {/* Footer */}
-        <div className="p-3 bg-[#F8F9FA] border-t border-[#E2E8F0] flex items-center justify-between text-[11px] text-[#64748B]">
-          <span>Select any role to explore specialized corridor intelligence</span>
+        {/* Modal Footer */}
+        <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>You can change your role anytime from the header</span>
           <button
             onClick={onClose}
-            className="px-3 py-1 bg-white hover:bg-[#F1F5F9] border border-[#CBD5E1] text-[#0F172A] rounded text-xs font-bold transition-colors"
+            className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-700 font-semibold hover:bg-slate-50 transition-colors"
           >
-            CANCEL
+            Close
           </button>
         </div>
       </div>
