@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PORTS, VESSELS, FLEET_TRUCKS } from '../data/mockData';
-import { Anchor, Clock, Ship, Truck, AlertTriangle, Package, Activity, ArrowRight, ShieldCheck, CheckCircle2, RotateCcw, Sparkles } from 'lucide-react';
+import { Anchor, Clock, Ship, Truck, AlertTriangle, Package, Activity, ArrowRight, ShieldCheck, CheckCircle2, RotateCcw } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { useToast } from './ToastNotification';
 import { playIosChime } from './DynamicIslandHabitBar';
@@ -27,32 +27,25 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
     addToast({
       type: 'success',
       title: 'Priority Berth Allocated',
-      message: `Berth 04 allocated for incoming temperature-controlled cargo. Dwell time reduced to 2.5 hours.`
+      message: `Berth 04 allocated for incoming cold-chain cargo. Dwell time reduced to 2.5 hours.`
     });
   };
 
   return (
-    <div className="bg-transparent p-3 sm:p-5 flex flex-col h-full overflow-y-auto space-y-4">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-black/[0.05] gap-3">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto space-y-4 pr-1">
+      {/* Apple Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.06] gap-3">
         <div>
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-rose-50 text-[#FF3B30] flex items-center justify-center border border-rose-100 shadow-2xs">
-              <Anchor className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
-                Port Congestion & Berth Intelligence
-              </h1>
-              <p className="text-xs text-slate-500 font-medium">
-                Outer anchorage queue surveillance, predictive dwell modeling, and berth allocation
-              </p>
-            </div>
-          </div>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1D1D1F]">
+            Port Operations & Berths
+          </h1>
+          <p className="text-xs text-[#86868B] mt-0.5">
+            Anchorage queue monitoring, 72h predictive dwell modeling, and berth optimization
+          </p>
         </div>
 
-        {/* Port Tabs */}
-        <div className="flex items-center gap-1.5 bg-slate-200/60 p-1 rounded-full border border-black/5 overflow-x-auto no-scrollbar shadow-2xs">
+        {/* Apple Segmented Port Selector */}
+        <div className="apple-segmented p-1 self-start sm:self-auto flex items-center overflow-x-auto no-scrollbar">
           {PORTS.map(p => (
             <button
               key={p.id}
@@ -62,14 +55,14 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
                 setClearedBerth(false);
                 if (onSelectAsset) onSelectAsset({ ...p, assetType: 'port' });
               }}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ios-btn ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 selectedPortId === p.id
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white text-[#1D1D1F] font-semibold shadow-xs'
+                  : 'text-[#86868B] hover:text-[#1D1D1F]'
               }`}
             >
               <span>{p.shortName}</span>
-              <span className={`px-2 py-0.2 rounded-full text-[9.5px] font-extrabold ${
+              <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold ${
                 p.congestion >= 70 ? 'bg-[#FF3B30] text-white' :
                 p.congestion >= 50 ? 'bg-[#FF9500] text-white' :
                 'bg-[#34C759] text-white'
@@ -82,77 +75,77 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start flex-1">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         {/* Left Column: Congestion Curve & Berth Allocation */}
         <div className="lg:col-span-7 space-y-4">
           {/* Congestion Forecast Chart Card */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-1">
+          <div className="apple-card p-5">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div>
-                <h2 className="text-sm font-bold text-slate-900">
-                  Congestion Trajectory (72-Hour Horizon)
+                <h2 className="text-sm font-bold text-[#1D1D1F]">
+                  Congestion Trajectory (72h Forecast)
                 </h2>
-                <div className="text-xs text-slate-500">
+                <div className="text-[11px] text-[#86868B] mt-0.5">
                   {activePort.name} ({activePort.code})
                 </div>
               </div>
-              <span className="text-xs font-bold px-2.5 py-1 bg-rose-50 text-rose-700 rounded-full border border-rose-200 self-start sm:self-auto">
+              <span className="text-[10px] font-bold px-2.5 py-1 bg-[#FF3B30]/10 text-[#FF3B30] rounded-full">
                 Peak at +48h ({activePort.forecast.h48}%)
               </span>
             </div>
 
             {/* Recharts Line Chart */}
-            <div className="h-44 sm:h-48 w-full mt-2">
+            <div className="h-44 sm:h-48 w-full mt-3">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={forecastData} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
-                  <XAxis dataKey="hour" tick={{ fontSize: 11, fill: '#64748B' }} />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#64748B' }} />
+                  <XAxis dataKey="hour" tick={{ fontSize: 11, fill: '#86868B' }} stroke="#E5E5EA" />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#86868B' }} stroke="#E5E5EA" />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0F172A', color: '#FFF', borderRadius: '8px', fontSize: '11px' }}
+                    contentStyle={{ backgroundColor: '#1D1D1F', color: '#FFF', borderRadius: '12px', fontSize: '11px', border: 'none' }}
                     formatter={(val) => [`${val}% Congestion`, 'Forecast']}
                   />
-                  <ReferenceLine y={75} stroke="#E11D48" strokeDasharray="3 3" label={{ value: 'Critical Threshold (75%)', position: 'insideTopRight', fill: '#E11D48', fontSize: 10 }} />
+                  <ReferenceLine y={75} stroke="#FF3B30" strokeDasharray="3 3" label={{ value: 'Threshold (75%)', position: 'insideTopRight', fill: '#FF3B30', fontSize: 10 }} />
                   <Line 
                     type="monotone" 
                     dataKey="congestion" 
-                    stroke="#0F172A" 
+                    stroke="#1D1D1F" 
                     strokeWidth={2.5} 
-                    dot={{ r: 4, fill: '#0F172A' }} 
-                    activeDot={{ r: 6, fill: '#E11D48' }} 
+                    dot={{ r: 4, fill: '#1D1D1F' }} 
+                    activeDot={{ r: 6, fill: '#FF3B30' }} 
                   />
                 </LineChart>
               </ResponsiveContainer>
             </div>
 
             {/* Forecast Strip */}
-            <div className="grid grid-cols-4 gap-2 mt-4 pt-3 border-t border-slate-100 text-center">
-              <div className="p-2 bg-slate-50 rounded-lg">
-                <div className="text-[10px] text-slate-500 font-medium">NOW</div>
-                <div className="text-sm font-bold text-slate-800">{activePort.forecast.now}%</div>
+            <div className="grid grid-cols-4 gap-2 mt-4 pt-3 border-t border-black/[0.06] text-center">
+              <div className="p-2.5 bg-black/[0.02] rounded-2xl">
+                <div className="text-[10px] text-[#86868B] font-semibold uppercase">Now</div>
+                <div className="text-sm font-bold text-[#1D1D1F] mt-0.5">{activePort.forecast.now}%</div>
               </div>
-              <div className="p-2 bg-slate-50 rounded-lg">
-                <div className="text-[10px] text-slate-500 font-medium">+24H</div>
-                <div className="text-sm font-bold text-slate-800">{activePort.forecast.h24}%</div>
+              <div className="p-2.5 bg-black/[0.02] rounded-2xl">
+                <div className="text-[10px] text-[#86868B] font-semibold uppercase">+24h</div>
+                <div className="text-sm font-bold text-[#1D1D1F] mt-0.5">{activePort.forecast.h24}%</div>
               </div>
-              <div className="p-2 bg-rose-50 rounded-lg border border-rose-100">
-                <div className="text-[10px] text-rose-700 font-bold">+48H PEAK</div>
-                <div className="text-sm font-bold text-rose-700">{activePort.forecast.h48}%</div>
+              <div className="p-2.5 bg-[#FF3B30]/5 rounded-2xl border border-[#FF3B30]/20">
+                <div className="text-[10px] text-[#FF3B30] font-bold uppercase">+48h Peak</div>
+                <div className="text-sm font-bold text-[#FF3B30] mt-0.5">{activePort.forecast.h48}%</div>
               </div>
-              <div className="p-2 bg-slate-50 rounded-lg">
-                <div className="text-[10px] text-slate-500 font-medium">+72H</div>
-                <div className="text-sm font-bold text-slate-800">{activePort.forecast.h72}%</div>
+              <div className="p-2.5 bg-black/[0.02] rounded-2xl">
+                <div className="text-[10px] text-[#86868B] font-semibold uppercase">+72h</div>
+                <div className="text-sm font-bold text-[#1D1D1F] mt-0.5">{activePort.forecast.h72}%</div>
               </div>
             </div>
           </div>
 
           {/* Finger Pier Berth Occupancy */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-slate-100 gap-1">
-              <h3 className="text-xs font-bold text-slate-900 uppercase">
-                Berth Occupancy & Terminal Finger Piers
+          <div className="apple-card p-5 space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
+              <h3 className="text-xs font-bold text-[#1D1D1F] uppercase tracking-wider">
+                Berth Staging & Piers
               </h3>
-              <span className="text-xs font-semibold text-emerald-700">
-                {clearedBerth ? 'Priority Reefer Berth Allocated' : '2 of 18 Berths Available'}
+              <span className="text-xs font-semibold text-[#34C759]">
+                {clearedBerth ? 'Priority Berth Allocated' : '2 of 18 Berths Open'}
               </span>
             </div>
 
@@ -165,22 +158,22 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
               ]).map(berth => (
                 <div 
                   key={berth.id}
-                  className={`p-3 rounded-xl border transition-all ${
+                  className={`p-3 rounded-2xl border transition-all ${
                     berth.occupied
-                      ? 'bg-slate-50/70 border-slate-200'
-                      : 'bg-emerald-50/60 border-emerald-300 ring-1 ring-emerald-100'
+                      ? 'bg-black/[0.02] border-black/[0.05]'
+                      : 'bg-[#34C759]/5 border-[#34C759]/30 ring-1 ring-[#34C759]/10'
                   }`}
                 >
                   <div className="flex justify-between items-center">
-                    <span className="font-bold text-slate-900 text-xs">{berth.id}: {berth.name}</span>
+                    <span className="font-bold text-[#1D1D1F] text-xs">{berth.id}: {berth.name}</span>
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                      berth.occupied ? 'bg-slate-200 text-slate-700' : 'bg-emerald-600 text-white'
+                      berth.occupied ? 'bg-black/10 text-[#1D1D1F]' : 'bg-[#34C759] text-white'
                     }`}>
                       {berth.occupied ? 'Occupied' : 'Vacant'}
                     </span>
                   </div>
-                  <div className="text-xs text-slate-700 mt-1 font-medium">{berth.vessel}</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">Dwell Status: {berth.dwell}</div>
+                  <div className="text-xs text-[#1D1D1F] mt-1 font-medium">{berth.vessel}</div>
+                  <div className="text-[11px] text-[#86868B] mt-0.5">Dwell: {berth.dwell}</div>
                 </div>
               ))}
             </div>
@@ -188,15 +181,15 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
             {!clearedBerth && selectedPortId === 'PORT-VTZ' && (
               <button
                 onClick={handleClearBerth}
-                className="w-full mt-2 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer"
+                className="w-full mt-2 py-2.5 apple-btn-primary text-xs cursor-pointer"
               >
-                Fast-Track Cold-Chain Dwell: Allocate Priority Berth 04 ➔
+                Fast-Track Cold-Chain: Allocate Priority Berth 04 ➔
               </button>
             )}
             {clearedBerth && (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg font-semibold text-emerald-900 text-xs flex items-center justify-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Berth 04 allocated. Estimated container dwell reduced to 2.5 hours.</span>
+              <div className="p-3 bg-[#34C759]/10 border border-[#34C759]/30 rounded-2xl font-semibold text-[#1D1D1F] text-xs flex items-center justify-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-[#34C759]" />
+                <span>Berth 04 allocated. Container dwell reduced to 2.5 hours.</span>
               </div>
             )}
           </div>
@@ -204,71 +197,74 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
 
         {/* Right Column: Affected Downstream Network */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="text-xs font-bold text-slate-900 uppercase">
-                Affected Downstream Network
+          <div className="apple-card p-5 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-black/[0.06]">
+              <h3 className="text-xs font-bold text-[#1D1D1F] uppercase tracking-wider">
+                Downstream Impact
               </h3>
-              <span className="text-xs text-slate-400">Live Impact</span>
+              <span className="text-xs text-[#86868B]">Live Correlation</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-2.5">
-                <Ship className="w-4 h-4 text-blue-600 shrink-0" />
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="p-3 bg-black/[0.02] rounded-2xl border border-black/[0.04] flex items-center gap-2.5">
+                <Ship className="w-4 h-4 text-[#0071E3] shrink-0" />
                 <div>
-                  <div className="text-sm font-bold text-slate-900">{activePort.waitingVessels}</div>
-                  <div className="text-[11px] text-slate-500">Ships at Anchor</div>
+                  <div className="text-sm font-bold text-[#1D1D1F]">{activePort.waitingVessels}</div>
+                  <div className="text-[11px] text-[#86868B]">Anchorage Queue</div>
                 </div>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-2.5">
-                <Truck className="w-4 h-4 text-amber-600 shrink-0" />
+              <div className="p-3 bg-black/[0.02] rounded-2xl border border-black/[0.04] flex items-center gap-2.5">
+                <Truck className="w-4 h-4 text-[#FF9500] shrink-0" />
                 <div>
-                  <div className="text-sm font-bold text-slate-900">{activePort.affectedTrucks}</div>
-                  <div className="text-[11px] text-slate-500">Trucks Staged</div>
+                  <div className="text-sm font-bold text-[#1D1D1F]">{activePort.affectedTrucks}</div>
+                  <div className="text-[11px] text-[#86868B]">Trucks Staged</div>
                 </div>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-2.5">
-                <Package className="w-4 h-4 text-slate-700 shrink-0" />
+              <div className="p-3 bg-black/[0.02] rounded-2xl border border-black/[0.04] flex items-center gap-2.5">
+                <Package className="w-4 h-4 text-[#5E5CE6] shrink-0" />
                 <div>
-                  <div className="text-sm font-bold text-slate-900">{activePort.affectedShipments}</div>
-                  <div className="text-[11px] text-slate-500">Active Shipments</div>
+                  <div className="text-sm font-bold text-[#1D1D1F]">{activePort.affectedShipments}</div>
+                  <div className="text-[11px] text-[#86868B]">Active Shipments</div>
                 </div>
               </div>
 
-              <div className="p-3 bg-rose-50 rounded-xl border border-rose-100 flex items-center gap-2.5">
-                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+              <div className="p-3 bg-[#FF3B30]/5 rounded-2xl border border-[#FF3B30]/20 flex items-center gap-2.5">
+                <AlertTriangle className="w-4 h-4 text-[#FF3B30] shrink-0" />
                 <div>
-                  <div className="text-sm font-bold text-rose-700">{activePort.affectedColdChain}</div>
-                  <div className="text-[11px] text-rose-700 font-medium">Reefers at Risk</div>
+                  <div className="text-sm font-bold text-[#FF3B30]">{activePort.affectedColdChain}</div>
+                  <div className="text-[11px] text-[#FF3B30] font-medium">Reefers at Risk</div>
                 </div>
               </div>
             </div>
 
             {/* Inbound Vessel Preview */}
-            <div className="pt-2 border-t border-slate-100">
-              <div className="text-xs font-bold text-slate-800 mb-2 flex items-center justify-between">
-                <span>Inbound Vessel Queue:</span>
-                <span className="text-[11px] text-slate-400">{inboundVessels.length} Inbound</span>
+            <div className="pt-2 border-t border-black/[0.06]">
+              <div className="text-xs font-bold text-[#1D1D1F] mb-2 flex items-center justify-between">
+                <span>Inbound Vessel Queue</span>
+                <span className="text-[11px] text-[#86868B]">{inboundVessels.length} Inbound</span>
               </div>
               <div className="space-y-2">
                 {inboundVessels.map(vessel => (
                   <div 
                     key={vessel.id}
-                    onClick={() => onSelectAsset && onSelectAsset({ ...vessel, assetType: 'vessel' })}
-                    className="p-2.5 bg-slate-50 hover:bg-slate-100/80 border border-slate-100 rounded-lg flex items-center justify-between cursor-pointer transition-colors"
+                    onClick={() => {
+                      playIosChime('tap');
+                      if (onSelectAsset) onSelectAsset({ ...vessel, assetType: 'vessel' });
+                    }}
+                    className="p-3 bg-black/[0.02] hover:bg-black/[0.05] rounded-2xl border border-black/[0.04] flex items-center justify-between cursor-pointer transition-colors"
                   >
                     <div>
-                      <div className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                        <Ship className="w-3.5 h-3.5 text-blue-600" />
+                      <div className="font-bold text-[#1D1D1F] text-xs flex items-center gap-1.5">
+                        <Ship className="w-3.5 h-3.5 text-[#0071E3]" />
                         <span>{vessel.name}</span>
                       </div>
-                      <div className="text-[11px] text-slate-500">
+                      <div className="text-[11px] text-[#86868B] mt-0.5">
                         {vessel.cargoTonnage} • ETA {vessel.eta}
                       </div>
                     </div>
-                    <span className="text-xs text-slate-400">➔</span>
+                    <span className="text-xs text-[#86868B]">➔</span>
                   </div>
                 ))}
               </div>
@@ -276,10 +272,13 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
 
             {/* Simulation Trigger */}
             <button
-              onClick={onTriggerImpactView}
-              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs transition-colors shadow-xs cursor-pointer"
+              onClick={() => {
+                playIosChime('tap');
+                if (onTriggerImpactView) onTriggerImpactView();
+              }}
+              className="w-full py-2.5 apple-btn-secondary text-xs flex items-center justify-center gap-2 cursor-pointer"
             >
-              Simulate Full Bottleneck Cascade ➔
+              <span>Simulate Cascade Bottleneck ➔</span>
             </button>
           </div>
         </div>
@@ -287,3 +286,4 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
     </div>
   );
 }
+

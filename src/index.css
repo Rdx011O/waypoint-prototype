@@ -2,179 +2,146 @@
 
 @layer base {
   :root {
-    --ios-bg: #F2F4F7;
-    --ios-card: rgba(255, 255, 255, 0.82);
-    --ios-card-hover: rgba(255, 255, 255, 0.95);
-    --ios-border: rgba(0, 0, 0, 0.06);
-    --ios-border-focus: rgba(0, 122, 255, 0.35);
-    --ios-text-primary: #0F172A;
-    --ios-text-secondary: #475569;
-    --ios-text-tertiary: #8E8E93;
-    --ios-blue: #007AFF;
-    --ios-blue-light: #EBF5FF;
-    --ios-green: #34C759;
-    --ios-orange: #FF9500;
-    --ios-red: #FF3B30;
-    --ios-purple: #AF52DE;
-    --ios-indigo: #5856D6;
+    --ios-bg: #F5F5F7;
+    --ios-card: #FFFFFF;
+    --ios-text-primary: #1D1D1F;
+    --ios-text-secondary: #86868B;
+    --ios-text-tertiary: #A1A1A6;
+    --ios-tint: #0071E3;
+    --ios-tint-hover: #0077ED;
+    --ios-tint-subtle: #F0F6FF;
+    --ios-success: #34C759;
+    --ios-warning: #FF9F0A;
+    --ios-destructive: #FF3B30;
+    --ios-indigo: #5E5CE6;
     --ios-teal: #30B0C7;
   }
 
   body {
     background-color: var(--ios-bg);
     color: var(--ios-text-primary);
-    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Plus Jakarta Sans", "Inter", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.018em;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
 
   .font-mono {
-    font-family: 'JetBrains Mono', 'IBM Plex Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    letter-spacing: -0.02em;
+    font-family: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* iOS Glassmorphism Card System */
-.ios-glass {
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
-}
-
-.ios-glass-dark {
-  background: rgba(15, 23, 42, 0.82);
-  backdrop-filter: blur(24px) saturate(190%);
-  -webkit-backdrop-filter: blur(24px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 0 1px 1px rgba(255, 255, 255, 0.1) inset;
-}
-
-.ios-glass-pill {
+/* Apple Human Interface Glass & Surface Tokens */
+.apple-glass {
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
 }
 
-.ios-glass-pill-dark {
-  background: rgba(15, 23, 42, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-}
-
-/* iOS Card Depth & Elevation */
-.ios-card {
+.apple-card {
   background: #FFFFFF;
   border-radius: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
-  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 8px 24px -4px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.ios-card:hover {
-  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.07), 0 4px 8px -2px rgba(0, 0, 0, 0.03);
-  transform: translateY(-1px);
+.apple-card:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04), 0 14px 32px -4px rgba(0, 0, 0, 0.07);
 }
 
-/* Tactile Press Effects (iOS Spring Press) */
-.ios-btn {
+.apple-card-interactive {
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.apple-card-interactive:active {
+  transform: scale(0.985);
+}
+
+/* Apple Inset Grouped List */
+.apple-group {
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+}
+
+/* Apple Segmented Control */
+.apple-segmented {
+  background: rgba(118, 118, 128, 0.12);
+  border-radius: 10px;
+  padding: 2px;
+}
+
+.apple-segmented-item {
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 12px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.ios-btn:active {
-  transform: scale(0.96);
-  filter: brightness(0.97);
-}
 
-.ios-tab-active {
+.apple-segmented-active {
   background: #FFFFFF;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  color: #1D1D1F;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.06);
 }
 
-/* Dynamic Island Breathing Animation */
-@keyframes dynamicPulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4), 0 10px 30px -5px rgba(0, 0, 0, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 6px rgba(0, 122, 255, 0.1), 0 10px 30px -5px rgba(0, 0, 0, 0.4);
-  }
+/* Tactile Spring Buttons */
+.apple-btn-primary {
+  background: var(--ios-tint);
+  color: #FFFFFF;
+  border-radius: 980px;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.apple-btn-primary:hover {
+  background: var(--ios-tint-hover);
+}
+.apple-btn-primary:active {
+  transform: scale(0.96);
+  filter: brightness(0.92);
 }
 
-.animate-island-pulse {
-  animation: dynamicPulse 3s infinite ease-in-out;
+.apple-btn-secondary {
+  background: rgba(118, 118, 128, 0.08);
+  color: #1D1D1F;
+  border-radius: 980px;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.apple-btn-secondary:hover {
+  background: rgba(118, 118, 128, 0.14);
+}
+.apple-btn-secondary:active {
+  transform: scale(0.96);
 }
 
-/* Custom sleek Apple-style scrollbars */
+/* Clean Apple Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.28);
+  background: rgba(0, 0, 0, 0.25);
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Leaflet map custom styling for ultra clean look */
+/* Leaflet Dark Minimal Cartography */
 .leaflet-container {
-  background-color: #0B1120 !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  background-color: #0B0F19 !important;
+  font-family: inherit !important;
   width: 100%;
   height: 100%;
-}
-
-.leaflet-control-attribution {
-  font-size: 8.5px !important;
-  background: rgba(15, 23, 42, 0.6) !important;
-  backdrop-filter: blur(8px);
-  color: #94A3B8 !important;
-  border-radius: 6px;
-  padding: 2px 6px !important;
-}
-
-/* Custom Shimmer Effect */
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-.animate-shimmer {
-  position: relative;
-  overflow: hidden;
-}
-.animate-shimmer::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  transform: translateX(-100%);
-  background-image: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: shimmer 2.5s infinite;
 }

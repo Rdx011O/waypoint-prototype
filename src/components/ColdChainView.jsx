@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { COLD_CHAIN_MONITORING } from '../data/mockData';
-import { ThermometerSnowflake, AlertTriangle, ShieldCheck, BatteryCharging, Zap, ArrowRight, CheckCircle2, RotateCcw, Sparkles } from 'lucide-react';
+import { ThermometerSnowflake, AlertTriangle, ShieldCheck, BatteryCharging, Zap, ArrowRight, CheckCircle2, RotateCcw } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { useToast } from './ToastNotification';
 import { playIosChime } from './DynamicIslandHabitBar';
@@ -17,33 +17,26 @@ export function ColdChainView({ onSelectAsset, activeRole = 'all' }) {
     setOverrideTriggered(true);
     addToast({
       type: 'success',
-      title: 'Auxiliary Cooling Override Engaged',
-      message: `Reefer ${activeReefer.id} genset set to maximum cooling boost. Temperature returning to safe zone.`
+      title: 'Auxiliary Boost Engaged',
+      message: `Reefer ${activeReefer.id} genset set to maximum cooling boost.`
     });
   };
 
   return (
-    <div className="bg-transparent p-3 sm:p-5 flex flex-col h-full overflow-y-auto space-y-4">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-black/[0.05] gap-3">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto space-y-4 pr-1">
+      {/* Apple Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.06] gap-3">
         <div>
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-teal-50 text-[#30B0C7] flex items-center justify-center border border-teal-100 shadow-2xs">
-              <ThermometerSnowflake className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
-                Cold-Chain Surveillance & Reefer IoT
-              </h1>
-              <p className="text-xs text-slate-500 font-medium">
-                Real-time thermal telemetry curves, compressor duty cycles, and emergency cooling overrides
-              </p>
-            </div>
-          </div>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1D1D1F]">
+            Cold-Chain Telemetry
+          </h1>
+          <p className="text-xs text-[#86868B] mt-0.5">
+            Continuous core thermal telemetry and remote genset override controls
+          </p>
         </div>
 
-        {/* Reefer Selector Tabs */}
-        <div className="flex items-center gap-1.5 bg-slate-200/60 p-1 rounded-full border border-black/5 overflow-x-auto no-scrollbar shadow-2xs">
+        {/* Apple Segmented Reefer Selector */}
+        <div className="apple-segmented p-1 self-start sm:self-auto flex items-center overflow-x-auto no-scrollbar">
           {COLD_CHAIN_MONITORING.map(r => (
             <button
               key={r.id}
@@ -53,14 +46,14 @@ export function ColdChainView({ onSelectAsset, activeRole = 'all' }) {
                 setOverrideTriggered(false);
                 if (onSelectAsset) onSelectAsset({ ...r, assetType: 'coldchain' });
               }}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ios-btn ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 selectedId === r.id
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white text-[#1D1D1F] font-semibold shadow-xs'
+                  : 'text-[#86868B] hover:text-[#1D1D1F]'
               }`}
             >
               <span>{r.id}</span>
-              <span className={`px-2 py-0.2 rounded-full text-[9.5px] font-extrabold ${
+              <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold ${
                 r.riskLevel === 'CRITICAL' ? 'bg-[#FF3B30] text-white' :
                 r.riskLevel === 'WARNING' ? 'bg-[#FF9500] text-white' :
                 'bg-[#34C759] text-white'
@@ -73,50 +66,51 @@ export function ColdChainView({ onSelectAsset, activeRole = 'all' }) {
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start flex-1">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         {/* Left Column: Temperature Graph & Override Controls */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="bg-white border border-black/[0.05] rounded-3xl p-5 shadow-2xs">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.05] gap-1">
+          <div className="apple-card p-5">
+            <div className="flex items-center justify-between pb-3 border-b border-black/[0.06]">
               <div>
-                <h2 className="text-sm font-extrabold text-slate-900 tracking-tight">
-                  Sensor Temperature Curve (Past 6 Hours)
+                <h2 className="text-sm font-bold text-[#1D1D1F]">
+                  Core Temperature History (6h)
                 </h2>
-                <div className="text-xs text-slate-500 font-medium">
-                  Safe Threshold Range: [{activeReefer.safeRangeMin}°C — {activeReefer.safeRangeMax}°C]
+                <div className="text-[11px] text-[#86868B] mt-0.5">
+                  Safe Operating Range: [{activeReefer.safeRangeMin}°C to {activeReefer.safeRangeMax}°C]
                 </div>
               </div>
 
-              <span className={`px-2.5 py-1 rounded-full text-[9.5px] font-extrabold self-start sm:self-auto ${
-                activeReefer.riskLevel === 'CRITICAL' ? 'bg-[#FF3B30]/15 text-[#FF3B30]' :
-                activeReefer.riskLevel === 'WARNING' ? 'bg-[#FF9500]/15 text-[#FF9500]' :
-                'bg-[#34C759]/15 text-[#34C759]'
+              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                activeReefer.riskLevel === 'CRITICAL' ? 'bg-[#FF3B30]/10 text-[#FF3B30]' :
+                activeReefer.riskLevel === 'WARNING' ? 'bg-[#FF9500]/10 text-[#FF9500]' :
+                'bg-[#34C759]/10 text-[#34C759]'
               }`}>
                 {activeReefer.statusLabel}
               </span>
             </div>
 
             {/* Recharts Curve */}
-            <div className="h-48 sm:h-52 w-full mt-3">
+            <div className="h-48 sm:h-56 w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={activeReefer.temperatureHistory} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
-                  <XAxis dataKey="time" tick={{ fontSize: 11, fill: '#64748B' }} />
+                  <XAxis dataKey="time" tick={{ fontSize: 11, fill: '#86868B' }} stroke="#E5E5EA" />
                   <YAxis 
                     domain={[activeReefer.safeRangeMin - 2, activeReefer.safeRangeMax + 2]} 
-                    tick={{ fontSize: 11, fill: '#64748B' }} 
+                    tick={{ fontSize: 11, fill: '#86868B' }}
+                    stroke="#E5E5EA"
                   />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0F172A', color: '#FFF', borderRadius: '8px', fontSize: '11px' }}
+                    contentStyle={{ backgroundColor: '#1D1D1F', color: '#FFF', borderRadius: '12px', fontSize: '11px', border: 'none' }}
                     formatter={(val) => [`${val}°C`, 'Core Temp']}
                   />
-                  <ReferenceLine y={activeReefer.safeRangeMax} stroke="#E11D48" strokeDasharray="3 3" label={{ value: `Max Safe (${activeReefer.safeRangeMax}°C)`, position: 'insideTopRight', fill: '#E11D48', fontSize: 10 }} />
-                  <ReferenceLine y={activeReefer.safeRangeMin} stroke="#059669" strokeDasharray="3 3" label={{ value: `Min Safe (${activeReefer.safeRangeMin}°C)`, position: 'insideBottomRight', fill: '#059669', fontSize: 10 }} />
+                  <ReferenceLine y={activeReefer.safeRangeMax} stroke="#FF3B30" strokeDasharray="3 3" label={{ value: `Max (${activeReefer.safeRangeMax}°C)`, position: 'insideTopRight', fill: '#FF3B30', fontSize: 10 }} />
+                  <ReferenceLine y={activeReefer.safeRangeMin} stroke="#34C759" strokeDasharray="3 3" label={{ value: `Min (${activeReefer.safeRangeMin}°C)`, position: 'insideBottomRight', fill: '#34C759', fontSize: 10 }} />
                   <Line 
                     type="monotone" 
                     dataKey="temp" 
-                    stroke={activeReefer.riskLevel === 'CRITICAL' ? '#E11D48' : '#0284C7'} 
+                    stroke={activeReefer.riskLevel === 'CRITICAL' ? '#FF3B30' : '#0071E3'} 
                     strokeWidth={2.5} 
-                    dot={{ r: 4, fill: activeReefer.riskLevel === 'CRITICAL' ? '#E11D48' : '#0284C7' }} 
+                    dot={{ r: 4, fill: activeReefer.riskLevel === 'CRITICAL' ? '#FF3B30' : '#0071E3' }} 
                     activeDot={{ r: 6 }} 
                   />
                 </LineChart>
@@ -124,93 +118,89 @@ export function ColdChainView({ onSelectAsset, activeRole = 'all' }) {
             </div>
 
             {/* Telemetry Readout */}
-            <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-slate-100 text-center">
-              <div className="p-2.5 bg-slate-50 rounded-lg">
-                <div className="text-[10px] text-slate-500 font-medium">CORE SENSOR TEMP</div>
-                <div className={`text-base font-bold mt-0.5 ${activeReefer.riskLevel === 'CRITICAL' ? 'text-rose-600' : 'text-slate-900'}`}>
+            <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-black/[0.06] text-center">
+              <div className="p-3 bg-black/[0.02] rounded-2xl">
+                <div className="text-[10px] text-[#86868B] font-semibold uppercase">Core Sensor</div>
+                <div className={`text-base font-bold mt-0.5 ${activeReefer.riskLevel === 'CRITICAL' ? 'text-[#FF3B30]' : 'text-[#1D1D1F]'}`}>
                   {activeReefer.currentTemp > 0 ? `+${activeReefer.currentTemp}°C` : `${activeReefer.currentTemp}°C`}
                 </div>
               </div>
-              <div className="p-2.5 bg-slate-50 rounded-lg">
-                <div className="text-[10px] text-slate-500 font-medium">OUTSIDE AMBIENT HEAT</div>
-                <div className="text-base font-bold text-slate-900 mt-0.5">{activeReefer.ambientTemp}°C</div>
+              <div className="p-3 bg-black/[0.02] rounded-2xl">
+                <div className="text-[10px] text-[#86868B] font-semibold uppercase">Ambient Heat</div>
+                <div className="text-base font-bold text-[#1D1D1F] mt-0.5">{activeReefer.ambientTemp}°C</div>
               </div>
-              <div className="p-2.5 bg-slate-50 rounded-lg">
-                <div className="text-[10px] text-slate-500 font-medium">COMPRESSOR DUTY</div>
-                <div className="text-base font-bold text-slate-900 mt-0.5">{activeReefer.compressorDuty}</div>
+              <div className="p-3 bg-black/[0.02] rounded-2xl">
+                <div className="text-[10px] text-[#86868B] font-semibold uppercase">Duty Cycle</div>
+                <div className="text-base font-bold text-[#1D1D1F] mt-0.5">{activeReefer.compressorDuty}</div>
               </div>
             </div>
           </div>
 
           {/* Action Alert */}
           {activeReefer.riskLevel === 'CRITICAL' && (
-            <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-slate-800 space-y-2">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div>
-                  <div className="font-bold flex items-center gap-2 text-xs text-rose-800">
-                    <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span>Thermal Excursion Risk: {activeReefer.id}</span>
-                  </div>
-                  <p className="text-xs text-slate-700 mt-1">
-                    {activeReefer.recommendedAction}
-                  </p>
+            <div className="p-4 bg-[#FF3B30]/5 border border-[#FF3B30]/20 rounded-2xl text-[#1D1D1F] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="font-bold flex items-center gap-1.5 text-xs text-[#FF3B30]">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span>Thermal Excursion Risk: {activeReefer.id}</span>
                 </div>
-
-                <button
-                  onClick={handleOverrideAux}
-                  disabled={overrideTriggered}
-                  className={`px-4 py-2 rounded-lg font-bold text-xs transition-all shrink-0 cursor-pointer shadow-xs ${
-                    overrideTriggered 
-                      ? 'bg-emerald-700 text-white cursor-not-allowed'
-                      : 'bg-rose-600 hover:bg-rose-700 text-white'
-                  }`}
-                >
-                  {overrideTriggered ? '✓ Aux Cooling Boost Active' : 'Engage Emergency Aux Boost ➔'}
-                </button>
+                <p className="text-xs text-[#86868B] mt-1">
+                  {activeReefer.recommendedAction}
+                </p>
               </div>
+
+              <button
+                onClick={handleOverrideAux}
+                disabled={overrideTriggered}
+                className={`apple-btn-primary self-start sm:self-auto text-xs py-2 px-3.5 whitespace-nowrap cursor-pointer ${
+                  overrideTriggered ? 'bg-[#34C759] text-white opacity-90' : 'bg-[#FF3B30] text-white'
+                }`}
+              >
+                {overrideTriggered ? '✓ Aux Boost Active' : 'Engage Boost ➔'}
+              </button>
             </div>
           )}
         </div>
 
         {/* Right Column: Cargo Spec */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-3">
-            <h3 className="text-xs font-bold text-slate-900 uppercase pb-2 border-b border-slate-100">
-              Reefer Cargo Manifest & Route
+          <div className="apple-card p-5 space-y-3">
+            <h3 className="text-xs font-bold text-[#1D1D1F] uppercase tracking-wider pb-2 border-b border-black/[0.06]">
+              Consignment & Manifest
             </h3>
 
             <div className="space-y-3 text-xs">
               <div>
-                <div className="text-[10px] text-slate-400 font-semibold uppercase">Product Description</div>
-                <div className="font-bold text-slate-900 text-sm mt-0.5">{activeReefer.product}</div>
-                <div className="text-slate-500 text-[11px]">Client: {activeReefer.client}</div>
+                <div className="text-[10px] text-[#86868B] font-semibold uppercase">Product Description</div>
+                <div className="font-bold text-[#1D1D1F] text-sm mt-0.5">{activeReefer.product}</div>
+                <div className="text-[#86868B] text-[11px]">Consignee: {activeReefer.client}</div>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Container ID:</span>
-                  <span className="font-bold text-slate-900">{activeReefer.containerId}</span>
+              <div className="apple-group text-xs">
+                <div className="p-3 flex justify-between border-b border-black/[0.06]">
+                  <span className="text-[#86868B]">Container ID</span>
+                  <span className="font-semibold text-[#1D1D1F]">{activeReefer.containerId}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Inbound Carrier Vessel:</span>
-                  <span className="font-bold text-slate-900">{activeReefer.vesselOrigin}</span>
+                <div className="p-3 flex justify-between border-b border-black/[0.06]">
+                  <span className="text-[#86868B]">Origin Vessel</span>
+                  <span className="font-semibold text-[#1D1D1F]">{activeReefer.vesselOrigin}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Assigned Road Rig:</span>
-                  <span className="font-bold text-slate-900">{activeReefer.assignedTruck}</span>
+                <div className="p-3 flex justify-between border-b border-black/[0.06]">
+                  <span className="text-[#86868B]">Assigned Hauler</span>
+                  <span className="font-semibold text-[#1D1D1F]">{activeReefer.assignedTruck}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Corridor Highway Route:</span>
-                  <span className="font-bold text-slate-900">{activeReefer.route}</span>
+                <div className="p-3 flex justify-between border-b border-black/[0.06]">
+                  <span className="text-[#86868B]">Corridor Highway</span>
+                  <span className="font-semibold text-[#1D1D1F]">{activeReefer.route}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Aux Battery Life:</span>
-                  <span className="font-bold text-amber-600">{activeReefer.batteryBackup}</span>
+                <div className="p-3 flex justify-between">
+                  <span className="text-[#86868B]">Aux Battery Reserve</span>
+                  <span className="font-semibold text-[#FF9500]">{activeReefer.batteryBackup}</span>
                 </div>
               </div>
 
-              <div className="p-3 bg-blue-50/60 border border-blue-100 rounded-xl text-xs text-slate-700 leading-relaxed">
-                <strong>Corridor Protection:</strong> When port delays are detected upstream, Waypoint triggers early warehouse pre-conditioning to ensure cold rooms are ready before the truck arrives.
+              <div className="p-3 bg-[#0071E3]/5 border border-[#0071E3]/20 rounded-2xl text-xs text-[#1D1D1F] leading-relaxed">
+                <strong>Corridor Protection:</strong> When port delays occur upstream, Waypoint automatically signals receiving chambers to pre-cool prior to container arrival.
               </div>
             </div>
           </div>
@@ -219,3 +209,4 @@ export function ColdChainView({ onSelectAsset, activeRole = 'all' }) {
     </div>
   );
 }
+

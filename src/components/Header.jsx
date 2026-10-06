@@ -13,7 +13,11 @@ import {
   Sparkles,
   Command,
   Radio,
-  SlidersHorizontal
+  SlidersHorizontal,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowUpRight,
+  Flame
 } from 'lucide-react';
 import { playIosChime } from './DynamicIslandHabitBar';
 
@@ -24,11 +28,19 @@ export function Header({
   alertCount, 
   onOpenAlerts, 
   onOpenRoleModal, 
-  onOpenGuideModal 
+  onOpenGuideModal,
+  onSelectTab
 }) {
   const [timeString, setTimeString] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isShiftDrawerOpen, setIsShiftDrawerOpen] = useState(false);
+  const [shiftTasks, setShiftTasks] = useState({
+    customs: true,
+    reefer: false,
+    backhaul: true,
+    port: false
+  });
 
   useEffect(() => {
     const updateTime = () => {
@@ -36,8 +48,7 @@ export function Header({
       const istTime = now.toLocaleTimeString('en-IN', { 
         timeZone: 'Asia/Kolkata', 
         hour: '2-digit', 
-        minute: '2-digit',
-        second: '2-digit'
+        minute: '2-digit'
       });
       setTimeString(`${istTime} IST`);
     };
@@ -56,170 +67,209 @@ export function Header({
     if (onSearch) onSearch('');
   };
 
+  const toggleTask = (key) => {
+    playIosChime('success');
+    setShiftTasks(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const roleConfigs = {
-    all: { label: 'Unified Control Tower', icon: Layers, badge: 'All Corridors', color: 'text-[#007AFF] bg-blue-50/80', dot: 'bg-[#007AFF]' },
-    cargo_owner: { label: 'Cargo Owner & Importer', icon: Package, badge: 'My Cargo', color: 'text-[#5856D6] bg-indigo-50/80', dot: 'bg-[#5856D6]' },
-    port: { label: 'Port Operations', icon: Anchor, badge: 'Harbour Ops', color: 'text-[#FF3B30] bg-rose-50/80', dot: 'bg-[#FF3B30]' },
-    fleet: { label: 'Fleet & Dispatch', icon: Truck, badge: 'Trucking', color: 'text-[#34C759] bg-emerald-50/80', dot: 'bg-[#34C759]' },
-    coldchain: { label: 'Cold-Chain Surveillance', icon: ThermometerSnowflake, badge: 'Reefer IoT', color: 'text-[#30B0C7] bg-teal-50/80', dot: 'bg-[#30B0C7]' }
+    all: { label: 'Unified Control Tower', icon: Layers, tint: 'text-[#0071E3]' },
+    cargo_owner: { label: 'Cargo Owner & Importer', icon: Package, tint: 'text-[#5E5CE6]' },
+    port: { label: 'Port Operations', icon: Anchor, tint: 'text-[#FF3B30]' },
+    fleet: { label: 'Fleet & Dispatch', icon: Truck, tint: 'text-[#34C759]' },
+    coldchain: { label: 'Cold-Chain Telemetry', icon: ThermometerSnowflake, tint: 'text-[#30B0C7]' }
   };
 
   const currentRole = roleConfigs[activeRole] || roleConfigs.all;
   const RoleIcon = currentRole.icon;
+  const completedCount = Object.values(shiftTasks).filter(Boolean).length;
 
   return (
-    <header className="ios-glass sticky top-0 z-40 px-3.5 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between border-b border-black/[0.06] shrink-0">
-      {/* Left: Brand Identity with Apple Squircle */}
-      <div className="flex items-center gap-3">
-        <button 
-          onClick={() => {
-            playIosChime('tap');
-            onOpenRoleModal();
-          }}
-          className="flex items-center gap-2.5 text-left group focus:outline-none ios-btn cursor-pointer"
-          title="Switch Corridor Persona"
-        >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-700 text-white flex items-center justify-center font-bold text-xs shadow-md group-hover:scale-105 transition-transform border border-white/20">
-            <span className="tracking-tight text-white">WP</span>
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-extrabold tracking-tight text-slate-900 text-[15px] sm:text-base">
-                Waypoint
-              </span>
-              <span className="px-2 py-0.5 text-[9.5px] font-bold bg-[#007AFF]/10 text-[#007AFF] rounded-full border border-[#007AFF]/20">
-                PRO 2.0
-              </span>
+    <>
+      <header className="apple-glass sticky top-0 z-40 px-4 sm:px-6 py-2.5 flex items-center justify-between shrink-0">
+        {/* Left: Brand Identity */}
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => {
+              playIosChime('tap');
+              onOpenRoleModal();
+            }}
+            className="flex items-center gap-2.5 text-left group focus:outline-none cursor-pointer"
+            title="Switch Persona"
+          >
+            <div className="w-8 h-8 rounded-[10px] bg-[#1D1D1F] text-white flex items-center justify-center font-bold text-xs shadow-sm group-hover:scale-105 transition-transform">
+              <span>WP</span>
             </div>
-            <p className="text-[10px] text-slate-500 font-medium hidden md:block tracking-tight">
-              Sea-to-Door Corridor Intelligence
-            </p>
-          </div>
-        </button>
-      </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold tracking-tight text-[#1D1D1F] text-sm sm:text-base">
+                  Waypoint
+                </span>
+                <span className="px-1.5 py-0.5 text-[9px] font-semibold bg-black/[0.05] text-[#86868B] rounded-md">
+                  Corridor
+                </span>
+              </div>
+            </div>
+          </button>
+        </div>
 
-      {/* Middle: Universal Search Box (iOS Search Capsule) */}
-      <div className="flex-1 max-w-md mx-3 hidden md:block">
-        <div className="relative group">
-          <Search className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#007AFF] transition-colors" />
-          <input
-            type="text"
-            placeholder="Search container, vessel, truck, port (e.g. SHP-8821, Eastern)..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="w-full bg-slate-200/50 hover:bg-slate-200/70 focus:bg-white border border-transparent focus:border-[#007AFF]/40 rounded-full text-xs py-2 pl-9 pr-12 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-3 focus:ring-[#007AFF]/10 transition-all font-medium"
-          />
-          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            {searchTerm ? (
+        {/* Center: Live Activity Capsule & Global Search */}
+        <div className="flex items-center gap-2.5 max-w-xl flex-1 mx-4 justify-center">
+          {/* Subtle Live Activity Status Capsule */}
+          <button
+            onClick={() => {
+              playIosChime('tap');
+              setIsShiftDrawerOpen(!isShiftDrawerOpen);
+            }}
+            className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-black/[0.04] hover:bg-black/[0.07] rounded-full text-xs transition-colors cursor-pointer border border-black/[0.04]"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse"></span>
+            <span className="font-semibold text-[#1D1D1F] text-[11.5px]">
+              {activeRole === 'coldchain' ? 'VC-2048 Core Temp: +7.9°C' :
+               activeRole === 'port' ? 'Visakhapatnam Berth 04 Staging' :
+               activeRole === 'fleet' ? '11 Backhauls Ready' :
+               'Corridor Active • 4 Containers In Transit'}
+            </span>
+            <span className="text-[10px] text-[#86868B] font-mono pl-1 border-l border-black/10">
+              {completedCount}/4 Sync
+            </span>
+          </button>
+
+          {/* Minimal Search Field */}
+          <div className="relative flex-1 max-w-xs hidden md:block">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#86868B]" />
+            <input
+              type="text"
+              placeholder="Search container, vessel, truck..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="w-full bg-black/[0.04] hover:bg-black/[0.07] focus:bg-white border border-transparent focus:border-black/15 rounded-full text-xs py-1.5 pl-8 pr-8 text-[#1D1D1F] placeholder-[#86868B] focus:outline-none transition-all"
+            />
+            {searchTerm && (
               <button
                 onClick={handleClearSearch}
-                className="text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-200"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#86868B] hover:text-[#1D1D1F]"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
-            ) : (
-              <kbd className="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-mono text-slate-400 bg-white rounded border border-slate-200 shadow-2xs">
-                ⌘K
-              </kbd>
             )}
           </div>
         </div>
-      </div>
 
-      {/* Right Controls: Role Switcher, Clock, Help, Alerts */}
-      <div className="flex items-center gap-2 sm:gap-2.5">
-        {/* Mobile Search Button */}
-        <button
-          onClick={() => {
-            playIosChime('tap');
-            setIsMobileSearchOpen(!isMobileSearchOpen);
-          }}
-          className="md:hidden p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-full transition-colors ios-btn"
-          title="Search"
-        >
-          <Search className="w-4 h-4" />
-        </button>
-
-        {/* Persona / Role Selector Pill */}
-        <button
-          onClick={() => {
-            playIosChime('tap');
-            onOpenRoleModal();
-          }}
-          className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-800 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-full transition-all shadow-2xs hover:shadow-xs ios-btn cursor-pointer"
-          title="Switch Persona Workspace"
-        >
-          <div className={`w-5 h-5 rounded-full flex items-center justify-center ${currentRole.color}`}>
-            <RoleIcon className="w-3 h-3" />
-          </div>
-          <span className="max-w-[110px] sm:max-w-[150px] truncate font-bold text-slate-800">
-            {currentRole.label}
-          </span>
-          <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
-        </button>
-
-        {/* Guide / Explanation Button */}
-        <button
-          onClick={() => {
-            playIosChime('tap');
-            onOpenGuideModal();
-          }}
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 bg-white/90 hover:bg-white border border-slate-200 rounded-full transition-all shadow-2xs ios-btn cursor-pointer"
-          title="How Waypoint Works"
-        >
-          <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-          <span className="hidden lg:inline">Guide</span>
-        </button>
-
-        {/* Live Satellite Clock */}
-        <div className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono font-semibold text-slate-700 bg-white/90 rounded-full border border-slate-200 shadow-2xs">
-          <span className="w-2 h-2 rounded-full bg-[#34C759] animate-pulse"></span>
-          <span>{timeString}</span>
-        </div>
-
-        {/* Alerts Trigger (iOS Badge) */}
-        <button
-          onClick={() => {
-            playIosChime('alert');
-            onOpenAlerts();
-          }}
-          className="relative p-2 text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 rounded-full border border-slate-200 shadow-2xs transition-all ios-btn cursor-pointer"
-          title="Corridor Alerts"
-        >
-          <Bell className="w-4 h-4" />
-          {alertCount > 0 && (
-            <span className="absolute -top-1 -right-1 px-1.5 min-w-[18px] h-[18px] bg-[#FF3B30] text-white text-[10px] font-extrabold rounded-full flex items-center justify-center shadow-md animate-scale">
-              {alertCount}
+        {/* Right Controls: Persona, Shift Hub, Alerts */}
+        <div className="flex items-center gap-2">
+          {/* Persona Switcher */}
+          <button
+            onClick={() => {
+              playIosChime('tap');
+              onOpenRoleModal();
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#1D1D1F] bg-black/[0.04] hover:bg-black/[0.07] rounded-full transition-colors cursor-pointer"
+          >
+            <RoleIcon className={`w-3.5 h-3.5 ${currentRole.tint}`} />
+            <span className="max-w-[120px] sm:max-w-[150px] truncate">
+              {currentRole.label}
             </span>
-          )}
-        </button>
-      </div>
+            <ChevronDown className="w-3 h-3 text-[#86868B]" />
+          </button>
 
-      {/* Mobile Expandable Search Tray */}
-      {isMobileSearchOpen && (
-        <div className="absolute top-full left-0 right-0 p-3 ios-glass border-b border-slate-200 shadow-xl md:hidden z-40 animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search container, vessel, truck, port..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              autoFocus
-              className="w-full bg-slate-100 border border-slate-300 rounded-full text-xs py-2 pl-9 pr-9 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#007AFF] focus:bg-white"
-            />
-            <button
-              onClick={() => {
-                handleClearSearch();
-                setIsMobileSearchOpen(false);
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 p-0.5"
-            >
-              <X className="w-4 h-4" />
-            </button>
+          {/* Guide Modal Trigger */}
+          <button
+            onClick={() => {
+              playIosChime('tap');
+              onOpenGuideModal();
+            }}
+            className="hidden sm:flex p-2 text-[#86868B] hover:text-[#1D1D1F] hover:bg-black/[0.04] rounded-full transition-colors cursor-pointer"
+            title="How Waypoint Works"
+          >
+            <HelpCircle className="w-4 h-4" />
+          </button>
+
+          {/* Live Alert Bell */}
+          <button
+            onClick={() => {
+              playIosChime('alert');
+              onOpenAlerts();
+            }}
+            className="relative p-2 text-[#1D1D1F] hover:bg-black/[0.04] rounded-full transition-colors cursor-pointer"
+            title="Operational Alerts"
+          >
+            <Bell className="w-4 h-4" />
+            {alertCount > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-[#FF3B30] rounded-full"></span>
+            )}
+          </button>
+        </div>
+      </header>
+
+      {/* Expandable Shift Overview Tray */}
+      {isShiftDrawerOpen && (
+        <div className="px-4 sm:px-6 py-3 bg-white/95 backdrop-blur-xl border-b border-black/[0.08] shadow-lg animate-in fade-in duration-200 z-30">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between pb-2 border-b border-black/[0.05]">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#1D1D1F]">Daily Operations Protocol</span>
+                <span className="text-[10px] text-[#86868B]">• 14-Day Zero-Deadhead Streak</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-semibold text-[#0071E3]">
+                  {completedCount} of 4 Complete
+                </span>
+                <button 
+                  onClick={() => setIsShiftDrawerOpen(false)}
+                  className="text-[#86868B] hover:text-[#1D1D1F] p-1"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mt-2.5">
+              {[
+                { key: 'customs', label: 'E-Gate Clearances', sub: '4 of 4 verified', tab: 'shipments' },
+                { key: 'reefer', label: 'VC-2048 Temperature', sub: '+7.9°C near threshold', tab: 'coldchain', alert: true },
+                { key: 'backhaul', label: '11 Return Loads', sub: 'Genome Valley matches', tab: 'backhaul' },
+                { key: 'port', label: 'Vizag 72h Peak Dwell', sub: '81% surge simulated', tab: 'impact' }
+              ].map(task => (
+                <div
+                  key={task.key}
+                  onClick={() => toggleTask(task.key)}
+                  className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                    shiftTasks[task.key]
+                      ? 'bg-[#34C759]/5 border-[#34C759]/30 text-[#1D1D1F]'
+                      : task.alert
+                        ? 'bg-[#FF3B30]/5 border-[#FF3B30]/30'
+                        : 'bg-black/[0.02] border-black/[0.06]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                      shiftTasks[task.key] ? 'bg-[#34C759] text-white' : 'border border-[#86868B]'
+                    }`}>
+                      {shiftTasks[task.key] && '✓'}
+                    </div>
+                    <div className="truncate">
+                      <div className="text-xs font-semibold truncate text-[#1D1D1F]">{task.label}</div>
+                      <div className="text-[10px] text-[#86868B] truncate">{task.sub}</div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onSelectTab) onSelectTab(task.tab);
+                      setIsShiftDrawerOpen(false);
+                    }}
+                    className="text-[#86868B] hover:text-[#0071E3] p-1"
+                  >
+                    <ArrowUpRight className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
-    </header>
+    </>
   );
 }

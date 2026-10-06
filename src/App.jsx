@@ -162,7 +162,7 @@ function AppContent() {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#F2F4F7] text-[#0F172A] font-sans antialiased selection:bg-[#007AFF] selection:text-white">
-      {/* Top iOS Header */}
+      {/* Top iOS Header with Integrated Live Activity & Protocol */}
       <Header
         activeRole={activeRole}
         setActiveRole={setActiveRole}
@@ -171,13 +171,7 @@ function AppContent() {
         onOpenAlerts={() => setActiveTab('alerts')}
         onOpenRoleModal={() => setIsRoleModalOpen(true)}
         onOpenGuideModal={() => setIsGuideModalOpen(true)}
-      />
-
-      {/* iOS Dynamic Island & Habit Hub */}
-      <DynamicIslandHabitBar
-        activeRole={activeRole}
         onSelectTab={(tab) => setActiveTab(tab)}
-        onTriggerImpact={handleTriggerImpactView}
       />
 
       {/* iOS Operational Metric Widgets */}
@@ -199,29 +193,26 @@ function AppContent() {
         {/* Main Stage Canvas */}
         <main className="flex-1 flex flex-col md:flex-row overflow-hidden relative min-w-0">
           {/* Active View Container */}
-          <div className="flex-1 h-full overflow-hidden p-2 sm:p-3.5 pb-20 md:pb-3.5 flex flex-col min-w-0">
-            {/* Role Context Notification Bar */}
+          <div className="flex-1 h-full overflow-hidden p-2 sm:p-4 pb-20 md:pb-4 flex flex-col min-w-0">
+            {/* Minimal Role Persona Badge (if not all) */}
             {activeBanner && (
-              <div className={`mb-3 px-4 py-2 rounded-2xl border text-xs flex items-center justify-between gap-2 shrink-0 shadow-2xs ${activeBanner.bg}`}>
+              <div className="mb-3 px-4 py-2.5 rounded-2xl bg-white border border-black/[0.06] text-xs flex items-center justify-between gap-3 shrink-0 shadow-xs">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="p-1 rounded-lg bg-white/80 shrink-0">
-                    <activeBanner.icon className="w-3.5 h-3.5" />
+                  <div className="w-6 h-6 rounded-lg bg-black/[0.04] flex items-center justify-center shrink-0">
+                    <activeBanner.icon className="w-3.5 h-3.5 text-[#1D1D1F]" />
                   </div>
                   <div className="truncate">
-                    <strong className="mr-1 font-bold">{activeBanner.title}:</strong>
-                    <span className="text-[11.5px] opacity-80 hidden sm:inline">{activeBanner.desc}</span>
+                    <span className="font-semibold text-[#1D1D1F] mr-1.5">{activeBanner.title}</span>
+                    <span className="text-[#86868B] hidden sm:inline text-[11px]">{activeBanner.desc}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[9.5px] font-extrabold px-2 py-0.5 bg-white/90 rounded-full border border-black/5 shadow-2xs">
-                    {activeBanner.badge}
-                  </span>
                   <button
                     onClick={() => setIsRoleModalOpen(true)}
-                    className="text-[11px] font-bold text-[#007AFF] hover:underline cursor-pointer"
+                    className="text-[11px] font-semibold text-[#0071E3] hover:underline cursor-pointer"
                   >
-                    Switch
+                    Switch Workspace
                   </button>
                 </div>
               </div>

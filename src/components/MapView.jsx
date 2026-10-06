@@ -518,72 +518,69 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
   };
 
   return (
-    <div className="relative w-full h-full bg-[#0F172A] overflow-hidden select-none font-mono">
+    <div className="relative w-full h-full bg-[#E5E5EA] overflow-hidden select-none font-sans">
       {/* Leaflet map canvas */}
       <div ref={mapContainerRef} className="w-full h-full" />
 
-      {/* Top Left: GIS Basemap Mode Switcher */}
-      <div className="absolute top-2 sm:top-3 left-2 sm:left-3 z-[400] flex items-center gap-1 bg-[#0F172A]/90 backdrop-blur-md p-1 rounded border border-[#334155] shadow-lg text-[10px] sm:text-xs">
+      {/* Top Left: Basemap Segmented Picker */}
+      <div className="absolute top-3 left-3 z-[400] apple-segmented p-1 shadow-md text-xs">
         <button
           onClick={() => setActiveBasemap('nautical_dark')}
-          className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
             activeBasemap === 'nautical_dark' 
-              ? 'bg-[#0284C7] text-white font-bold' 
-              : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]'
+              ? 'bg-white text-[#1D1D1F] shadow-xs' 
+              : 'text-[#86868B] hover:text-[#1D1D1F]'
           }`}
-          title="Nautical Dark (AIS Radar Mode)"
+          title="Nautical Dark Radar"
         >
           <Moon className="w-3.5 h-3.5" />
-          <span className="hidden md:inline">NAUTICAL RADAR</span>
+          <span className="hidden sm:inline">Dark Radar</span>
         </button>
 
         <button
           onClick={() => setActiveBasemap('satellite_hybrid')}
-          className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
             activeBasemap === 'satellite_hybrid' 
-              ? 'bg-[#0284C7] text-white font-bold' 
-              : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]'
+              ? 'bg-white text-[#1D1D1F] shadow-xs' 
+              : 'text-[#86868B] hover:text-[#1D1D1F]'
           }`}
-          title="Satellite Coastal Hybrid Imagery"
+          title="Satellite Imagery"
         >
           <Satellite className="w-3.5 h-3.5" />
-          <span className="hidden md:inline">SATELLITE</span>
+          <span className="hidden sm:inline">Satellite</span>
         </button>
 
         <button
           onClick={() => setActiveBasemap('carto_light')}
-          className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
             activeBasemap === 'carto_light' 
-              ? 'bg-[#0284C7] text-white font-bold' 
-              : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]'
+              ? 'bg-white text-[#1D1D1F] shadow-xs' 
+              : 'text-[#86868B] hover:text-[#1D1D1F]'
           }`}
-          title="Industrial Paper Chart Style"
+          title="Light Map"
         >
           <Sun className="w-3.5 h-3.5" />
-          <span className="hidden md:inline">CHARTS</span>
+          <span className="hidden sm:inline">Map</span>
         </button>
       </div>
 
-      {/* Top Center: Vessel Type Quick Filter Chips (Desktop) */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[400] hidden lg:flex items-center gap-1 bg-[#0F172A]/90 backdrop-blur-md px-2.5 py-1 rounded border border-[#334155] shadow-lg text-[10px] text-white">
-        <span className="text-[#94A3B8] font-bold mr-1 flex items-center gap-1">
-          <Filter className="w-3 h-3 text-[#38BDF8]" /> AIS FLEET:
-        </span>
+      {/* Top Center: Vessel Category Filter (Desktop) */}
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[400] hidden lg:flex items-center gap-1 apple-glass px-2 py-1 rounded-full shadow-md text-xs">
         {[
-          { id: 'ALL', label: 'All Ships (10)' },
-          { id: 'Container', label: 'Container (4)' },
-          { id: 'Tanker', label: 'Tankers (1)' },
-          { id: 'Gas Carrier', label: 'LNG/Gas (1)' },
-          { id: 'Bulk Carrier', label: 'Bulk (1)' },
-          { id: 'Reefer', label: 'Reefer (1)' }
+          { id: 'ALL', label: 'All Fleet' },
+          { id: 'Container', label: 'Container' },
+          { id: 'Tanker', label: 'Tanker' },
+          { id: 'Gas Carrier', label: 'LNG' },
+          { id: 'Bulk Carrier', label: 'Bulk' },
+          { id: 'Reefer', label: 'Reefer' }
         ].map(cat => (
           <button
             key={cat.id}
             onClick={() => setVesselTypeFilter(cat.id)}
-            className={`px-1.5 py-0.5 rounded transition-colors ${
+            className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
               vesselTypeFilter === cat.id
-                ? 'bg-[#0284C7] text-white font-bold'
-                : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]'
+                ? 'bg-[#0071E3] text-white shadow-xs font-semibold'
+                : 'text-[#1D1D1F] hover:bg-black/[0.04]'
             }`}
           >
             {cat.label}
@@ -591,108 +588,84 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
         ))}
       </div>
 
-      {/* Top Right: Layer Visibility & Simulation Controls */}
-      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 z-[400] flex flex-col gap-1.5 sm:gap-2">
-        {/* Live AIS Telemetry Stream Control */}
-        <div className="bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded p-1.5 sm:p-2 text-xs text-[#F8FAFC] shadow-lg flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${isSimulating ? 'bg-[#10B981] animate-ping' : 'bg-[#64748B]'}`}></span>
-            <span className="text-[10px] sm:text-[11px] font-bold hidden sm:inline">
-              {isSimulating ? 'LIVE AIS SIM' : 'SIM PAUSED'}
-            </span>
-          </div>
-
-          <button
-            onClick={() => setIsSimulating(!isSimulating)}
-            className="p-1 rounded hover:bg-[#1E293B] text-[#38BDF8] transition-colors"
-            title={isSimulating ? "Pause live simulation" : "Resume live simulation"}
-          >
-            {isSimulating ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-          </button>
-        </div>
-
-        {/* Mobile Layers Toggle Button */}
+      {/* Top Right: Layer Visibility & Zoom Controls */}
+      <div className="absolute top-3 right-3 z-[400] flex flex-col gap-2 items-end">
+        {/* Live Simulation Pulse Pill */}
         <button
-          onClick={() => setIsLayersPanelOpen(!isLayersPanelOpen)}
-          className="md:hidden bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded p-1.5 text-[#38BDF8] flex items-center justify-center self-end shadow-md"
-          title="Toggle Layer Filters"
+          onClick={() => setIsSimulating(!isSimulating)}
+          className="apple-glass px-3 py-1.5 rounded-full text-xs font-semibold text-[#1D1D1F] shadow-md flex items-center gap-2 hover:bg-white/90 cursor-pointer"
         >
-          <Layers className="w-4 h-4" />
+          <span className={`w-2 h-2 rounded-full ${isSimulating ? 'bg-[#34C759] animate-pulse' : 'bg-[#86868B]'}`}></span>
+          <span className="text-[11px] font-mono">{isSimulating ? 'Live AIS' : 'Paused'}</span>
+          {isSimulating ? <Pause className="w-3 h-3 text-[#86868B]" /> : <Play className="w-3 h-3 text-[#86868B]" />}
         </button>
 
-        {/* Layer Filters Box (Desktop or Expanded on Mobile) */}
-        <div className={`bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded shadow-lg p-2 sm:p-2.5 text-xs text-[#F8FAFC] ${
-          isLayersPanelOpen ? 'block' : 'hidden md:block'
-        }`}>
-          <div className="text-[10px] text-[#94A3B8] font-bold uppercase mb-1.5 flex items-center justify-between">
-            <span className="flex items-center gap-1">
-              <Layers className="w-3 h-3 text-[#38BDF8]" />
-              CORRIDOR GIS LAYERS
-            </span>
+        {/* Layer Controls Dropdown/Panel */}
+        <div className="apple-card p-2.5 shadow-md text-xs space-y-1 w-44">
+          <div className="text-[10px] font-bold text-[#86868B] uppercase tracking-wider mb-1 px-1 flex items-center gap-1">
+            <Layers className="w-3 h-3" />
+            <span>Map Layers</span>
           </div>
 
-          <div className="space-y-1">
-            {[
-              { key: 'vessels', label: 'AIS Ship Traffic (10)', color: 'bg-[#38BDF8]' },
-              { key: 'shippingTrunks', label: 'Shipping Trunks (TSS)', color: 'bg-[#A78BFA]' },
-              { key: 'ports', label: 'Seaports & Berths (4)', color: 'bg-[#EF4444]' },
-              { key: 'anchorage', label: 'Anchorage Zones (3)', color: 'bg-[#0284C7]' },
-              { key: 'routes', label: 'Corridor Corridors', color: 'bg-[#F59E0B]' },
-              { key: 'trucks', label: 'Highway Fleet (5)', color: 'bg-[#10B981]' }
-            ].map(item => (
-              <label 
-                key={item.key} 
-                className="flex items-center gap-2 cursor-pointer hover:bg-[#1E293B] px-1 py-0.5 rounded text-[10px] sm:text-[11px] text-[#E2E8F0]"
-              >
-                <input
-                  type="checkbox"
-                  checked={activeLayerFilters[item.key]}
-                  onChange={() => toggleLayer(item.key)}
-                  className="rounded bg-[#1E293B] border-[#475569] text-[#0284C7] focus:ring-0 w-3 h-3 cursor-pointer"
-                />
+          {[
+            { key: 'vessels', label: 'AIS Vessels', color: 'bg-[#0071E3]' },
+            { key: 'shippingTrunks', label: 'Shipping Trunks', color: 'bg-[#5E5CE6]' },
+            { key: 'ports', label: 'Major Ports', color: 'bg-[#FF3B30]' },
+            { key: 'anchorage', label: 'Anchorages', color: 'bg-[#30B0C7]' },
+            { key: 'routes', label: 'Corridor Roads', color: 'bg-[#FF9500]' },
+            { key: 'trucks', label: 'Active Trucks', color: 'bg-[#34C759]' }
+          ].map(item => (
+            <label 
+              key={item.key} 
+              className="flex items-center justify-between px-1.5 py-1 rounded-lg hover:bg-black/[0.04] cursor-pointer text-[11px] text-[#1D1D1F]"
+            >
+              <div className="flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${item.color}`}></span>
-                <span className="truncate max-w-[130px]">{item.label}</span>
-              </label>
-            ))}
-          </div>
+                <span>{item.label}</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={activeLayerFilters[item.key]}
+                onChange={() => toggleLayer(item.key)}
+                className="w-3.5 h-3.5 rounded text-[#0071E3] accent-[#0071E3] cursor-pointer"
+              />
+            </label>
+          ))}
         </div>
 
-        {/* Zoom Controls */}
-        <div className="bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded shadow-lg flex flex-col divide-y divide-[#334155] overflow-hidden self-end">
+        {/* Apple Maps Style Vertical Floating Zoom Control */}
+        <div className="apple-card shadow-md flex flex-col divide-y divide-black/[0.06] overflow-hidden">
           <button
             onClick={() => mapInstanceRef.current && mapInstanceRef.current.zoomIn()}
-            className="p-1.5 sm:p-2 text-[#94A3B8] hover:text-white hover:bg-[#1E293B] transition-colors"
+            className="p-2 text-[#1D1D1F] hover:bg-black/[0.04] transition-colors cursor-pointer"
             title="Zoom In"
           >
-            <ZoomIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <ZoomIn className="w-4 h-4" />
           </button>
           <button
             onClick={() => mapInstanceRef.current && mapInstanceRef.current.zoomOut()}
-            className="p-1.5 sm:p-2 text-[#94A3B8] hover:text-white hover:bg-[#1E293B] transition-colors"
+            className="p-2 text-[#1D1D1F] hover:bg-black/[0.04] transition-colors cursor-pointer"
             title="Zoom Out"
           >
-            <ZoomOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <ZoomOut className="w-4 h-4" />
           </button>
           <button
             onClick={resetView}
-            className="p-1.5 sm:p-2 text-[#94A3B8] hover:text-white hover:bg-[#1E293B] transition-colors"
-            title="Recenter East Coast Corridor"
+            className="p-2 text-[#1D1D1F] hover:bg-black/[0.04] transition-colors cursor-pointer"
+            title="Center Corridor"
           >
-            <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <Compass className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Bottom Center: Live Cursor Coordinate Radar Readout */}
-      <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 z-[400] bg-[#0F172A]/90 backdrop-blur-md border border-[#334155] rounded px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-[11px] text-[#E2E8F0] shadow-lg flex items-center gap-2 sm:gap-3 max-w-[95%] truncate">
-        <Crosshair className="w-3.5 h-3.5 text-[#38BDF8] shrink-0 animate-spin" style={{ animationDuration: '8s' }} />
-        <span>
-          LAT: <strong className="text-white">{cursorCoords.lat.toFixed(4)}°N</strong> | LON: <strong className="text-white">{cursorCoords.lng.toFixed(4)}°E</strong>
+      {/* Bottom Floating Telemetry Capsule */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[400] apple-glass px-4 py-1.5 rounded-full text-xs text-[#1D1D1F] shadow-lg flex items-center gap-2 max-w-[90%] truncate">
+        <Crosshair className="w-3.5 h-3.5 text-[#0071E3] shrink-0" />
+        <span className="font-mono text-[11px]">
+          {cursorCoords.lat.toFixed(4)}°N, {cursorCoords.lng.toFixed(4)}°E
         </span>
-        <span className="hidden md:inline text-[#64748B]">|</span>
-        <span className="hidden md:inline text-[#94A3B8]">
-          BAY OF BENGAL TSS ACTIVE • 10 AIS TARGETS
-        </span>
+        <span className="text-[#86868B] hidden md:inline">• Bay of Bengal Corridor Sync Active</span>
       </div>
     </div>
   );

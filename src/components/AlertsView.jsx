@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ALERTS } from '../data/mockData';
 import { Bell, AlertTriangle, AlertCircle, Info, ArrowRight, Check, Filter, CheckCircle2 } from 'lucide-react';
 import { useToast } from './ToastNotification';
+import { playIosChime } from './DynamicIslandHabitBar';
 
 export function AlertsView({ onSelectAsset, onJumpToTab, activeRole = 'all' }) {
   const [filterSeverity, setFilterSeverity] = useState('ALL');
@@ -30,6 +31,7 @@ export function AlertsView({ onSelectAsset, onJumpToTab, activeRole = 'all' }) {
 
   const handleAcknowledge = (id, e) => {
     e.stopPropagation();
+    playIosChime('tap');
     setAcknowledgedAlerts(prev => ({ ...prev, [id]: true }));
     addToast({
       type: 'info',
@@ -39,35 +41,31 @@ export function AlertsView({ onSelectAsset, onJumpToTab, activeRole = 'all' }) {
   };
 
   return (
-    <div className="bg-slate-50/60 p-4 sm:p-6 flex flex-col h-full overflow-y-auto space-y-4">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-slate-200 gap-3">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto space-y-4 pr-1">
+      {/* Apple Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.06] gap-3">
         <div>
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-rose-50 text-rose-700">
-              <Bell className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-lg sm:text-xl font-bold text-slate-900">
-                Operational Alerts & Exception Feed
-              </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Real-time synchronized alarms across Sea, Port, Highway, and Cold-Chain nodes
-              </p>
-            </div>
-          </div>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1D1D1F]">
+            Alerts & Exceptions
+          </h1>
+          <p className="text-xs text-[#86868B] mt-0.5">
+            Synchronized alarm feed across Sea, Port, Highway, and Cold-Chain nodes
+          </p>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-slate-200 overflow-x-auto no-scrollbar shadow-2xs">
+        {/* Apple Segmented Severity Filter */}
+        <div className="apple-segmented p-1 self-start sm:self-auto flex items-center overflow-x-auto no-scrollbar">
           {['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'INFO'].map(sev => (
             <button
               key={sev}
-              onClick={() => setFilterSeverity(sev)}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              onClick={() => {
+                playIosChime('tap');
+                setFilterSeverity(sev);
+              }}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
                 filterSeverity === sev
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-white text-[#1D1D1F] font-semibold shadow-xs'
+                  : 'text-[#86868B] hover:text-[#1D1D1F]'
               }`}
             >
               {sev === 'ALL' ? 'All Alerts' : sev.charAt(0) + sev.slice(1).toLowerCase()}
@@ -79,10 +77,10 @@ export function AlertsView({ onSelectAsset, onJumpToTab, activeRole = 'all' }) {
       {/* Alert Feed */}
       <div className="space-y-3 max-w-4xl">
         {filteredAlerts.length === 0 ? (
-          <div className="p-12 text-center text-slate-500 bg-white rounded-2xl border border-slate-200 shadow-2xs">
-            <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
-            <div className="font-bold text-slate-900 text-base">All Clear</div>
-            <p className="text-xs text-slate-500 mt-1">No active exceptions or delays found for this category.</p>
+          <div className="p-12 text-center text-[#86868B] apple-card">
+            <CheckCircle2 className="w-10 h-10 text-[#34C759] mx-auto mb-2" />
+            <div className="font-bold text-[#1D1D1F] text-base">All Clear</div>
+            <p className="text-xs text-[#86868B] mt-1">No active exceptions or delays found for this category.</p>
           </div>
         ) : (
           filteredAlerts.map(alert => {
@@ -93,45 +91,48 @@ export function AlertsView({ onSelectAsset, onJumpToTab, activeRole = 'all' }) {
             return (
               <div
                 key={alert.id}
-                className={`p-4 sm:p-5 rounded-xl border transition-all ${
+                className={`apple-card p-4 sm:p-5 transition-all ${
                   isAcked 
-                    ? 'opacity-60 bg-slate-50 border-slate-200' 
-                    : isCritical ? 'bg-white border-rose-300 shadow-xs ring-1 ring-rose-100' :
-                      isHigh ? 'bg-white border-amber-300 shadow-xs' :
-                      'bg-white border-slate-200 shadow-2xs'
+                    ? 'opacity-60 bg-black/[0.02]' 
+                    : isCritical ? 'border-[#FF3B30]/40' :
+                      isHigh ? 'border-[#FF9500]/40' :
+                      ''
                 }`}
               >
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 pb-2.5 border-b border-slate-100">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 pb-2.5 border-b border-black/[0.06]">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                      isCritical ? 'bg-rose-100 text-rose-700' :
-                      isHigh ? 'bg-amber-100 text-amber-800' :
-                      alert.severity === 'MEDIUM' ? 'bg-blue-100 text-blue-800' :
-                      'bg-slate-100 text-slate-700'
+                      isCritical ? 'bg-[#FF3B30]/10 text-[#FF3B30]' :
+                      isHigh ? 'bg-[#FF9500]/10 text-[#FF9500]' :
+                      alert.severity === 'MEDIUM' ? 'bg-[#0071E3]/10 text-[#0071E3]' :
+                      'bg-black/10 text-[#86868B]'
                     }`}>
                       {alert.severity}
                     </span>
-                    <span className="font-bold text-slate-900 text-sm">{alert.entity}</span>
-                    <span className="text-xs text-slate-400">({alert.time})</span>
+                    <span className="font-bold text-[#1D1D1F] text-sm">{alert.entity}</span>
+                    <span className="text-xs text-[#86868B]">({alert.time})</span>
                   </div>
 
-                  <span className="text-xs text-slate-400 font-mono">
+                  <span className="text-xs text-[#86868B] font-mono">
                     ID: {alert.id}
                   </span>
                 </div>
 
-                <div className="mt-2.5 text-xs sm:text-sm font-semibold text-slate-900">
+                <div className="mt-2.5 text-xs sm:text-sm font-semibold text-[#1D1D1F]">
                   {alert.title}
                 </div>
 
-                <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                <p className="mt-1 text-xs text-[#86868B] leading-relaxed">
                   {alert.details}
                 </p>
 
-                <div className="mt-3.5 pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <div className="mt-3.5 pt-2.5 border-t border-black/[0.06] flex flex-wrap items-center justify-between gap-2">
                   <button
-                    onClick={() => onJumpToTab && onJumpToTab(alert.targetTab)}
-                    className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                    onClick={() => {
+                      playIosChime('tap');
+                      if (onJumpToTab) onJumpToTab(alert.targetTab);
+                    }}
+                    className="apple-btn-primary text-xs py-1.5 px-3.5 flex items-center gap-1.5 cursor-pointer bg-[#1D1D1F] text-white hover:bg-black"
                   >
                     <span>{alert.action}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -140,7 +141,7 @@ export function AlertsView({ onSelectAsset, onJumpToTab, activeRole = 'all' }) {
                   <button
                     onClick={(e) => handleAcknowledge(alert.id, e)}
                     disabled={isAcked}
-                    className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium transition-colors cursor-pointer"
+                    className="apple-btn-secondary text-xs py-1.5 px-3 cursor-pointer"
                   >
                     {isAcked ? '✓ Acknowledged' : 'Mark as Read'}
                   </button>
@@ -153,3 +154,4 @@ export function AlertsView({ onSelectAsset, onJumpToTab, activeRole = 'all' }) {
     </div>
   );
 }
+
