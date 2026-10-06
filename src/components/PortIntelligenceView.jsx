@@ -3,6 +3,7 @@ import { PORTS, VESSELS, FLEET_TRUCKS } from '../data/mockData';
 import { Anchor, Clock, Ship, Truck, AlertTriangle, Package, Activity, ArrowRight, ShieldCheck, CheckCircle2, RotateCcw, Sparkles } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { useToast } from './ToastNotification';
+import { playIosChime } from './DynamicIslandHabitBar';
 
 export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activeRole = 'all' }) {
   const [selectedPortId, setSelectedPortId] = useState('PORT-VTZ');
@@ -21,6 +22,7 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
   const inboundVessels = VESSELS.filter(v => v.destPortId === activePort.id);
 
   const handleClearBerth = () => {
+    playIosChime('success');
     setClearedBerth(true);
     addToast({
       type: 'success',
@@ -30,19 +32,19 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
   };
 
   return (
-    <div className="bg-slate-50/60 p-4 sm:p-6 flex flex-col h-full overflow-y-auto space-y-4">
+    <div className="bg-transparent p-3 sm:p-5 flex flex-col h-full overflow-y-auto space-y-4">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-slate-200 gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-black/[0.05] gap-3">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-rose-50 text-rose-700">
+            <div className="w-10 h-10 rounded-2xl bg-rose-50 text-[#FF3B30] flex items-center justify-center border border-rose-100 shadow-2xs">
               <Anchor className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
                 Port Congestion & Berth Intelligence
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 font-medium">
                 Outer anchorage queue surveillance, predictive dwell modeling, and berth allocation
               </p>
             </div>
@@ -50,24 +52,27 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
         </div>
 
         {/* Port Tabs */}
-        <div className="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-slate-200 overflow-x-auto no-scrollbar shadow-2xs">
+        <div className="flex items-center gap-1.5 bg-slate-200/60 p-1 rounded-full border border-black/5 overflow-x-auto no-scrollbar shadow-2xs">
           {PORTS.map(p => (
             <button
               key={p.id}
               onClick={() => {
+                playIosChime('tap');
                 setSelectedPortId(p.id);
                 setClearedBerth(false);
                 if (onSelectAsset) onSelectAsset({ ...p, assetType: 'port' });
               }}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ios-btn ${
                 selectedPortId === p.id
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <span>{p.shortName}</span>
-              <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
-                p.congestion > 60 ? 'bg-rose-500 text-white' : 'bg-slate-200 text-slate-700'
+              <span className={`px-2 py-0.2 rounded-full text-[9.5px] font-extrabold ${
+                p.congestion >= 70 ? 'bg-[#FF3B30] text-white' :
+                p.congestion >= 50 ? 'bg-[#FF9500] text-white' :
+                'bg-[#34C759] text-white'
               }`}>
                 {p.congestion}%
               </span>
@@ -77,7 +82,7 @@ export function PortIntelligenceView({ onSelectAsset, onTriggerImpactView, activ
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start flex-1">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start flex-1">
         {/* Left Column: Congestion Curve & Berth Allocation */}
         <div className="lg:col-span-7 space-y-4">
           {/* Congestion Forecast Chart Card */}

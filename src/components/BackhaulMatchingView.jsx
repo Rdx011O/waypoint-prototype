@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BACKHAUL_MATCHES, FLEET_TRUCKS } from '../data/mockData';
 import { Repeat, ArrowRight, CheckCircle2, ShieldCheck, Truck, Package, DollarSign, Leaf, Zap, Sparkles } from 'lucide-react';
 import { useToast } from './ToastNotification';
+import { playIosChime } from './DynamicIslandHabitBar';
 
 export function BackhaulMatchingView({ onSelectAsset, onAssignBackhaul, activeRole = 'all' }) {
   const [confirmedMatches, setConfirmedMatches] = useState({});
@@ -9,6 +10,7 @@ export function BackhaulMatchingView({ onSelectAsset, onAssignBackhaul, activeRo
   const { addToast } = useToast();
 
   const handleConfirmMatch = (match) => {
+    playIosChime('success');
     setConfirmedMatches(prev => ({ ...prev, [match.id]: true }));
     if (onAssignBackhaul) onAssignBackhaul(match);
     addToast({
@@ -19,19 +21,19 @@ export function BackhaulMatchingView({ onSelectAsset, onAssignBackhaul, activeRo
   };
 
   return (
-    <div className="bg-slate-50/60 p-4 sm:p-6 flex flex-col h-full overflow-y-auto space-y-4">
+    <div className="bg-transparent p-3 sm:p-5 flex flex-col h-full overflow-y-auto space-y-4">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-slate-200 gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-black/[0.05] gap-3">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-emerald-50 text-emerald-700">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-[#34C759] flex items-center justify-center border border-emerald-100 shadow-2xs">
               <Repeat className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
                 Backhaul Revenue & Deadhead Elimination
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 font-medium">
                 Automatically pair empty returning trucks with regional freight loads
               </p>
             </div>
@@ -39,31 +41,31 @@ export function BackhaulMatchingView({ onSelectAsset, onAssignBackhaul, activeRo
         </div>
 
         {/* Operational Pill */}
-        <div className="flex items-center gap-3 bg-white border border-slate-200 px-3.5 py-1.5 rounded-lg text-xs shadow-2xs">
+        <div className="flex items-center gap-3 bg-white border border-black/[0.05] px-4 py-2 rounded-full text-xs shadow-2xs">
           <div>
-            <span className="text-slate-400">Empty Trucks: </span>
-            <span className="font-bold text-amber-600">26</span>
+            <span className="text-slate-400 font-medium">Empty Trucks: </span>
+            <span className="font-extrabold text-[#FF9500]">26</span>
           </div>
           <div className="text-slate-200">|</div>
           <div>
-            <span className="text-slate-400">Loads Available: </span>
-            <span className="font-bold text-slate-800">18</span>
+            <span className="text-slate-400 font-medium">Loads Available: </span>
+            <span className="font-extrabold text-slate-800">18</span>
           </div>
           <div className="text-slate-200">|</div>
           <div>
-            <span className="text-slate-400">Matches Ready: </span>
-            <span className="font-bold text-emerald-600">11</span>
+            <span className="text-slate-400 font-medium">Matches Ready: </span>
+            <span className="font-extrabold text-[#34C759]">11</span>
           </div>
         </div>
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start flex-1">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start flex-1">
         {/* Left: Structured Match Rows */}
-        <div className="lg:col-span-8 space-y-3">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-700 px-1">
-            <span>AUTOMATED BACKHAUL OPPORTUNITIES ({BACKHAUL_MATCHES.length})</span>
-            <span className="text-emerald-700 font-medium">
+        <div className="lg:col-span-8 space-y-2.5">
+          <div className="flex items-center justify-between text-xs font-bold text-slate-700 px-1">
+            <span className="uppercase tracking-wider text-[11px] text-slate-400">AUTOMATED BACKHAUL OPPORTUNITIES ({BACKHAUL_MATCHES.length})</span>
+            <span className="text-[#34C759] font-bold">
               {Object.keys(confirmedMatches).length} Dispatched
             </span>
           </div>
@@ -76,28 +78,29 @@ export function BackhaulMatchingView({ onSelectAsset, onAssignBackhaul, activeRo
               <div
                 key={match.id}
                 onClick={() => {
+                  playIosChime('tap');
                   setSelectedMatch(match);
                   if (onSelectAsset) onSelectAsset({ ...match, assetType: 'truck' });
                 }}
-                className={`p-4 sm:p-5 rounded-xl border transition-all cursor-pointer ${
+                className={`p-4 sm:p-5 rounded-3xl border transition-all cursor-pointer ios-btn ${
                   isSelected
-                    ? 'bg-white border-blue-600 shadow-md ring-2 ring-blue-100'
-                    : 'bg-white hover:bg-slate-50/80 border-slate-200 shadow-2xs'
+                    ? 'bg-white border-[#34C759] shadow-md ring-2 ring-[#34C759]/20'
+                    : 'bg-white/80 hover:bg-white border-black/[0.05] shadow-2xs'
                 }`}
               >
                 {/* Top Row */}
-                <div className="flex items-start justify-between gap-2 pb-2.5 border-b border-slate-100">
+                <div className="flex items-start justify-between gap-2 pb-2.5 border-b border-black/[0.05]">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 bg-slate-900 text-white text-xs font-bold rounded">
+                    <span className="px-2.5 py-0.5 bg-slate-900 text-white text-xs font-bold rounded-full font-mono">
                       {match.truckId}
                     </span>
-                    <span className="text-xs text-slate-600 font-medium">
+                    <span className="text-xs text-slate-600 font-semibold">
                       {match.truckType}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold flex items-center gap-1">
+                    <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold flex items-center gap-1">
                       <Zap className="w-3 h-3 text-emerald-600" />
                       {match.matchScore}% Match
                     </span>

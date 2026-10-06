@@ -21,9 +21,11 @@ import {
   Calendar,
   MapPin,
   TrendingUp,
-  Info
+  Info,
+  Zap
 } from 'lucide-react';
 import { useToast } from './ToastNotification';
+import { playIosChime } from './DynamicIslandHabitBar';
 
 export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
   const [selectedShipmentId, setSelectedShipmentId] = useState('SHP-8821');
@@ -41,6 +43,7 @@ export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
   const activeShipment = CARGO_OWNER_SHIPMENTS.find(s => s.id === selectedShipmentId) || CARGO_OWNER_SHIPMENTS[0];
 
   const handleRequestMitigation = (shipmentId) => {
+    playIosChime('success');
     setMitigationMap(prev => ({ ...prev, [shipmentId]: true }));
     addToast({
       type: 'success',
@@ -50,6 +53,7 @@ export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
   };
 
   const handleDownloadDocs = (shipmentId) => {
+    playIosChime('tap');
     addToast({
       type: 'info',
       title: 'Documentation Downloaded',
@@ -58,39 +62,42 @@ export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
   };
 
   return (
-    <div className="bg-slate-50/60 p-4 sm:p-6 flex flex-col h-full overflow-y-auto space-y-4">
+    <div className="bg-transparent p-3 sm:p-5 flex flex-col h-full overflow-y-auto space-y-4">
       {/* Top Header & Overview Summary */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-blue-50 text-blue-700">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#5856D6] shadow-2xs">
               <Package className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
                 Shipments & Consignment Tracking
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Real-time visibility from port of loading to destination warehouse door
+              <p className="text-xs text-slate-500 font-medium">
+                Live sea-to-warehouse door tracking with predictive delay prevention
               </p>
             </div>
           </div>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-slate-200 self-start md:self-auto shadow-2xs">
+        {/* iOS Segmented Filter Control */}
+        <div className="flex items-center gap-1 bg-slate-200/60 p-1 rounded-full border border-black/5 self-start md:self-auto shadow-2xs">
           {[
-            { id: 'ALL', label: 'All Shipments (4)' },
-            { id: 'EXCEPTIONS', label: 'Exceptions & Delays (2)', badge: '2' },
+            { id: 'ALL', label: 'All Units (4)' },
+            { id: 'EXCEPTIONS', label: 'Delays (2)', alert: true },
             { id: 'ON_SCHEDULE', label: 'On Schedule (2)' }
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setFilterStatus(tab.id)}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+              onClick={() => {
+                playIosChime('tap');
+                setFilterStatus(tab.id);
+              }}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ios-btn ${
                 filterStatus === tab.id
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               {tab.label}
@@ -101,38 +108,38 @@ export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
 
       {/* 4 Summary Highlight Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="p-3.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
-          <div className="text-[11px] font-medium text-slate-500">Active Consignments</div>
-          <div className="text-lg font-bold text-slate-900 mt-0.5">4 Containers</div>
-          <div className="text-[11px] text-slate-500 mt-1">100% Customs Cleared</div>
+        <div className="p-4 bg-white border border-black/[0.05] rounded-3xl shadow-2xs hover:shadow-xs transition-shadow">
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Active Units</div>
+          <div className="text-xl font-extrabold text-slate-900 mt-1">4 Containers</div>
+          <div className="text-[11px] text-[#34C759] font-bold mt-1">100% Customs Cleared</div>
         </div>
 
-        <div className="p-3.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
-          <div className="text-[11px] font-medium text-slate-500">On-Time Performance</div>
-          <div className="text-lg font-bold text-emerald-600 mt-0.5">50% On Schedule</div>
-          <div className="text-[11px] text-slate-500 mt-1">2 shipments meeting SLA</div>
+        <div className="p-4 bg-white border border-black/[0.05] rounded-3xl shadow-2xs hover:shadow-xs transition-shadow">
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">On-Time SLA</div>
+          <div className="text-xl font-extrabold text-[#34C759] mt-1">50% On Schedule</div>
+          <div className="text-[11px] text-slate-500 font-medium mt-1">2 shipments meeting SLA</div>
         </div>
 
-        <div className="p-3.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
-          <div className="text-[11px] font-medium text-slate-500">Action Required</div>
-          <div className="text-lg font-bold text-rose-600 mt-0.5">2 Cascade Delays</div>
-          <div className="text-[11px] text-rose-600 mt-1 font-medium">Caused by port queue</div>
+        <div className="p-4 bg-white border border-black/[0.05] rounded-3xl shadow-2xs hover:shadow-xs transition-shadow">
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Action Needed</div>
+          <div className="text-xl font-extrabold text-[#FF3B30] mt-1">2 Delays</div>
+          <div className="text-[11px] text-[#FF3B30] font-bold mt-1">Vizag Berth 04 Bottleneck</div>
         </div>
 
-        <div className="p-3.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
-          <div className="text-[11px] font-medium text-slate-500">Total Cargo Value</div>
-          <div className="text-lg font-bold text-slate-900 mt-0.5">₹15.20 Crore</div>
-          <div className="text-[11px] text-blue-600 mt-1 font-medium">Insured & IoT Monitored</div>
+        <div className="p-4 bg-white border border-black/[0.05] rounded-3xl shadow-2xs hover:shadow-xs transition-shadow">
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Insured Cargo Value</div>
+          <div className="text-xl font-extrabold text-[#007AFF] mt-1">₹15.20 Cr</div>
+          <div className="text-[11px] text-slate-500 font-medium mt-1">Active IoT Thermal Shield</div>
         </div>
       </div>
 
       {/* Main Grid: Shipments List (Left) & Detailed Inspector (Right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start flex-1">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start flex-1">
         {/* Left Column: Shipment List Cards */}
-        <div className="lg:col-span-5 space-y-3">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-700 px-1">
-            <span>YOUR CONSIGNMENTS ({filteredShipments.length})</span>
-            <span className="text-slate-400 font-normal text-[11px]">Click to inspect</span>
+        <div className="lg:col-span-5 space-y-2.5">
+          <div className="flex items-center justify-between text-xs font-bold text-slate-700 px-1">
+            <span className="uppercase tracking-wider text-[11px] text-slate-400">YOUR CONSIGNMENTS ({filteredShipments.length})</span>
+            <span className="text-slate-400 font-medium text-[11px]">Tap to inspect</span>
           </div>
 
           <div className="space-y-2.5">
@@ -145,52 +152,53 @@ export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
                 <div
                   key={shp.id}
                   onClick={() => {
+                    playIosChime('tap');
                     setSelectedShipmentId(shp.id);
                     if (onSelectAsset) onSelectAsset({ ...shp, assetType: 'shipment' });
                   }}
-                  className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                  className={`p-4 rounded-3xl border transition-all cursor-pointer ios-btn ${
                     isSelected
-                      ? 'bg-white border-blue-600 shadow-md ring-2 ring-blue-100'
-                      : 'bg-white hover:bg-slate-50/80 border-slate-200 shadow-2xs'
+                      ? 'bg-white border-[#007AFF] shadow-md ring-2 ring-[#007AFF]/20'
+                      : 'bg-white/80 hover:bg-white border-black/[0.05] shadow-2xs'
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3 pb-2 border-b border-slate-100">
+                  <div className="flex items-start justify-between gap-3 pb-2.5 border-b border-black/[0.05]">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-slate-900 text-sm">{shp.id}</span>
-                        <span className="text-[11px] px-2 py-0.5 bg-slate-100 text-slate-700 rounded font-mono font-medium">
+                        <span className="font-extrabold text-slate-900 text-sm tracking-tight">{shp.id}</span>
+                        <span className="text-[10.5px] px-2 py-0.5 bg-slate-100 text-slate-700 rounded-full font-mono font-bold">
                           {shp.containerId}
                         </span>
                       </div>
-                      <div className="text-xs text-slate-600 font-medium mt-0.5">
+                      <div className="text-xs text-slate-600 font-semibold mt-0.5">
                         {shp.consignee}
                       </div>
                     </div>
 
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                      isCritical ? 'bg-rose-50 text-rose-700 border border-rose-200' :
-                      isWarning ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                      'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    <span className={`px-2.5 py-1 rounded-full text-[9.5px] font-extrabold ${
+                      isCritical ? 'bg-[#FF3B30]/15 text-[#FF3B30]' :
+                      isWarning ? 'bg-[#FF9500]/15 text-[#FF9500]' :
+                      'bg-[#34C759]/15 text-[#34C759]'
                     }`}>
                       {shp.hasException ? 'Delay Alert' : 'On Schedule'}
                     </span>
                   </div>
 
-                  <div className="mt-2 text-xs font-semibold text-slate-800 line-clamp-1">
+                  <div className="mt-2 text-xs font-bold text-slate-800 line-clamp-1">
                     {shp.product}
                   </div>
 
-                  <div className="mt-3 pt-2.5 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs">
+                  <div className="mt-2.5 pt-2.5 border-t border-black/[0.05] grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <div className="text-[10px] text-slate-400 font-medium">ESTIMATED ARRIVAL</div>
-                      <div className={`font-semibold mt-0.5 ${shp.hasException ? 'text-rose-600' : 'text-emerald-700'}`}>
+                      <div className="text-[9.5px] text-slate-400 font-bold uppercase">ESTIMATED ARRIVAL</div>
+                      <div className={`font-extrabold mt-0.5 ${shp.hasException ? 'text-[#FF3B30]' : 'text-[#34C759]'}`}>
                         {shp.dynamicPredictedEta}
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <div className="text-[10px] text-slate-400 font-medium">SCHEDULE VARIANCE</div>
-                      <div className={`font-semibold mt-0.5 ${shp.hasException ? 'text-rose-600 font-bold' : 'text-slate-700'}`}>
+                      <div className="text-[9.5px] text-slate-400 font-bold uppercase">SCHEDULE VARIANCE</div>
+                      <div className={`font-extrabold mt-0.5 ${shp.hasException ? 'text-[#FF3B30]' : 'text-slate-700'}`}>
                         {shp.delayHours}
                       </div>
                     </div>
@@ -202,46 +210,46 @@ export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
         </div>
 
         {/* Right Column: Detailed Shipment Inspection Card */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+        <div className="lg:col-span-7 space-y-3.5">
+          <div className="bg-white border border-black/[0.05] rounded-3xl p-5 shadow-xs space-y-4">
             {/* Title & Core Details Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-black/[0.05] gap-2">
               <div>
-                <span className="text-[11px] font-semibold text-blue-700 uppercase tracking-wider">
-                  Consignment Detail
+                <span className="text-[10px] font-bold text-[#007AFF] uppercase tracking-wider">
+                  CONSIGNMENT DETAIL
                 </span>
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 mt-0.5">
+                <h2 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight mt-0.5">
                   {activeShipment.product}
                 </h2>
-                <div className="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-2">
-                  <span>Shipment: <strong className="text-slate-800">{activeShipment.id}</strong></span>
+                <div className="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-2 font-medium">
+                  <span>Shipment: <strong className="text-slate-800 font-mono">{activeShipment.id}</strong></span>
                   <span>•</span>
-                  <span>Container: <strong className="text-slate-800">{activeShipment.containerId}</strong></span>
+                  <span>Container: <strong className="text-slate-800 font-mono">{activeShipment.containerId}</strong></span>
                   <span>•</span>
                   <span>Type: <strong className="text-slate-800">{activeShipment.containerType}</strong></span>
                 </div>
               </div>
 
-              <div className="text-left sm:text-right shrink-0 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span className="text-[10px] text-slate-400 uppercase font-semibold">Cargo Value</span>
-                <div className="text-sm font-bold text-slate-900">{activeShipment.cargoValue}</div>
+              <div className="text-left sm:text-right shrink-0 bg-slate-50 p-2.5 rounded-2xl border border-black/[0.05]">
+                <span className="text-[9.5px] text-slate-400 uppercase font-bold">Cargo Value</span>
+                <div className="text-sm font-extrabold text-slate-900">{activeShipment.cargoValue}</div>
               </div>
             </div>
 
             {/* Exception Explanation Card (When delayed) */}
             {activeShipment.hasException && (
-              <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-xl text-slate-800 space-y-2.5">
+              <div className="p-4 bg-rose-50/80 border border-rose-200/80 rounded-2xl text-slate-800 space-y-2.5 shadow-2xs">
                 <div className="flex items-center justify-between">
-                  <div className="font-bold flex items-center gap-2 text-xs text-rose-800">
-                    <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <div className="font-extrabold flex items-center gap-2 text-xs text-[#FF3B30]">
+                    <AlertTriangle className="w-4 h-4 text-[#FF3B30] shrink-0" />
                     <span>Active Delay: {activeShipment.statusLabel}</span>
                   </div>
-                  <span className="text-xs font-bold text-rose-700 bg-white px-2 py-0.5 rounded border border-rose-200">
+                  <span className="text-xs font-extrabold text-[#FF3B30] bg-white px-2.5 py-0.5 rounded-full border border-rose-200">
                     Delay: {activeShipment.delayHours}
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-700 leading-relaxed">
+                <p className="text-xs text-slate-700 leading-relaxed font-medium">
                   {activeShipment.exceptionReason}
                 </p>
 
@@ -249,20 +257,23 @@ export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
                   <button
                     onClick={() => handleRequestMitigation(activeShipment.id)}
                     disabled={mitigationMap[activeShipment.id]}
-                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer ${
+                    className={`px-4 py-2 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer ios-btn ${
                       mitigationMap[activeShipment.id]
-                        ? 'bg-emerald-700 text-white cursor-not-allowed'
-                        : 'bg-rose-600 hover:bg-rose-700 text-white'
+                        ? 'bg-emerald-600 text-white cursor-not-allowed'
+                        : 'bg-[#FF3B30] hover:bg-rose-700 text-white'
                     }`}
                   >
                     {mitigationMap[activeShipment.id] 
                       ? '✓ Fast-Track Pass Dispatched to Terminal' 
-                      : 'Request Priority Yard Staging & Fast-Track ➔'}
+                      : 'Request Yard Staging & Fast-Track ➔'}
                   </button>
 
                   <button
-                    onClick={onJumpToColdChain}
-                    className="text-xs font-semibold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1"
+                    onClick={() => {
+                      playIosChime('tap');
+                      onJumpToColdChain();
+                    }}
+                    className="text-xs font-bold text-[#007AFF] hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <span>View IoT Temperature Curve</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -272,33 +283,33 @@ export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
             )}
 
             {/* ETA vs Planned SLA Comparison Card */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-100 text-center">
-              <div className="p-2 bg-white rounded-lg border border-slate-100">
-                <div className="text-[10px] text-slate-500 font-medium">PLANNED SLA ETA</div>
-                <div className="text-xs sm:text-sm font-bold text-slate-800 mt-1">{activeShipment.originalEta}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 p-3.5 bg-slate-50/80 rounded-2xl border border-black/[0.05] text-center">
+              <div className="p-2.5 bg-white rounded-xl border border-black/[0.05]">
+                <div className="text-[9.5px] text-slate-400 font-bold uppercase">PLANNED SLA</div>
+                <div className="text-xs sm:text-sm font-extrabold text-slate-800 mt-0.5">{activeShipment.originalEta}</div>
               </div>
 
-              <div className="p-2 bg-blue-50/60 rounded-lg border border-blue-200">
-                <div className="text-[10px] text-blue-700 font-bold">DYNAMIC PREDICTED ETA</div>
-                <div className={`text-xs sm:text-sm font-bold mt-1 ${activeShipment.hasException ? 'text-rose-700' : 'text-emerald-700'}`}>
+              <div className="p-2.5 bg-blue-50/80 rounded-xl border border-blue-200/80">
+                <div className="text-[9.5px] text-[#007AFF] font-bold uppercase">DYNAMIC PREDICTED ETA</div>
+                <div className={`text-xs sm:text-sm font-extrabold mt-0.5 ${activeShipment.hasException ? 'text-[#FF3B30]' : 'text-[#34C759]'}`}>
                   {activeShipment.dynamicPredictedEta}
                 </div>
               </div>
 
-              <div className="p-2 bg-white rounded-lg border border-slate-100">
-                <div className="text-[10px] text-slate-500 font-medium">CUSTOMS STATUS</div>
-                <div className="text-xs font-bold text-emerald-700 mt-1">{activeShipment.customsStatus}</div>
+              <div className="p-2.5 bg-white rounded-xl border border-black/[0.05]">
+                <div className="text-[9.5px] text-slate-400 font-bold uppercase">CUSTOMS STATUS</div>
+                <div className="text-xs font-extrabold text-[#34C759] mt-0.5">{activeShipment.customsStatus}</div>
               </div>
             </div>
 
             {/* Visual Multi-Modal Milestone Tracker */}
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center justify-between pb-1 border-b border-slate-100">
-                <span className="text-xs font-bold text-slate-900 uppercase">
+            <div className="space-y-3 pt-1">
+              <div className="flex items-center justify-between pb-1.5 border-b border-black/[0.05]">
+                <span className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
                   Sea-to-Door Chain of Custody
                 </span>
-                <span className="text-xs text-slate-500">
-                  Current Step: <strong className="text-slate-800">{activeShipment.currentMilestone}</strong>
+                <span className="text-[11px] text-slate-500 font-medium">
+                  Current Step: <strong className="text-slate-800 font-bold">{activeShipment.currentMilestone}</strong>
                 </span>
               </div>
 
@@ -306,14 +317,14 @@ export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
                 {activeShipment.chainOfCustody.map((step, idx) => (
                   <div key={idx} className="relative">
                     <div className={`absolute -left-[27px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white ${
-                      step.done ? 'bg-emerald-500 shadow-xs' : step.current ? 'bg-blue-600 ring-4 ring-blue-100' : 'bg-slate-300'
+                      step.done ? 'bg-[#34C759] shadow-xs' : step.current ? 'bg-[#007AFF] ring-4 ring-blue-100' : 'bg-slate-300'
                     }`} />
 
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-0.5">
-                      <span className={`font-semibold ${step.current ? 'text-blue-900 font-bold' : step.done ? 'text-slate-800' : 'text-slate-500'}`}>
+                      <span className={`font-bold ${step.current ? 'text-[#007AFF]' : step.done ? 'text-slate-800' : 'text-slate-400'}`}>
                         {step.step}
                       </span>
-                      <span className="text-[11px] text-slate-500">{step.time}</span>
+                      <span className="text-[10.5px] text-slate-500 font-mono">{step.time}</span>
                     </div>
                   </div>
                 ))}
@@ -321,17 +332,17 @@ export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
             </div>
 
             {/* Action Bar */}
-            <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+            <div className="pt-3 border-t border-black/[0.05] flex flex-wrap items-center justify-between gap-3">
               <button
                 onClick={() => handleDownloadDocs(activeShipment.id)}
-                className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ios-btn shadow-2xs"
               >
-                <Download className="w-4 h-4 text-slate-500" />
+                <Download className="w-3.5 h-3.5 text-slate-500" />
                 <span>Download Bill of Entry & Sensor Logs</span>
               </button>
 
               <div className="text-xs text-slate-500">
-                Customs Doc: <strong className="font-mono text-slate-800">{activeShipment.customsDoc}</strong>
+                Customs Doc: <strong className="font-mono text-slate-800 font-bold">{activeShipment.customsDoc}</strong>
               </div>
             </div>
           </div>
@@ -340,3 +351,4 @@ export function CargoOwnerView({ onSelectAsset, onJumpToColdChain }) {
     </div>
   );
 }
+

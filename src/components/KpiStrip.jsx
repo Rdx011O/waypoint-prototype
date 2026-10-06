@@ -9,10 +9,11 @@ import {
   CheckCircle2, 
   ThermometerSnowflake, 
   Activity, 
-  DollarSign,
-  TrendingUp,
-  FileCheck
+  DollarSign, 
+  TrendingUp, 
+  FileCheck 
 } from 'lucide-react';
+import { playIosChime } from './DynamicIslandHabitBar';
 
 export function KpiStrip({ onMetricClick, activeMetric, activeRole = 'all' }) {
   const getMetricsByRole = () => {
@@ -23,55 +24,55 @@ export function KpiStrip({ onMetricClick, activeMetric, activeRole = 'all' }) {
             id: 'shipments',
             tab: 'shipments',
             label: 'Total Shipments',
-            value: '4 Consignments',
-            sub: 'Total Value: ₹15.2 Cr',
+            value: '4 Units',
+            sub: '₹15.2 Cr Total Value',
             icon: Package,
             status: 'normal',
-            color: 'text-blue-600 bg-blue-50'
+            color: 'text-[#007AFF] bg-blue-50'
           },
           {
             id: 'sla',
             tab: 'shipments',
-            label: 'On-Time Delivery Rate',
+            label: 'On-Time SLA',
             value: '50%',
-            sub: '2 on schedule, 2 delayed',
+            sub: '2 On Time, 2 Delayed',
             icon: TrendingUp,
             status: 'warning',
             badge: '2 Delayed',
-            color: 'text-amber-600 bg-amber-50'
+            color: 'text-[#FF9500] bg-amber-50'
           },
           {
             id: 'exceptions',
             tab: 'shipments',
-            label: 'Active Delays',
-            value: '2 Shipments',
-            sub: 'Due to port bottleneck',
+            label: 'Port Cascades',
+            value: '2 Delays',
+            sub: 'Berth 04 Queue',
             icon: AlertTriangle,
             status: 'critical',
-            badge: 'Action Needed',
-            color: 'text-rose-600 bg-rose-50'
+            badge: 'Urgent',
+            color: 'text-[#FF3B30] bg-rose-50'
           },
           {
             id: 'coldchain',
             tab: 'coldchain',
-            label: 'Reefer Temp Alert',
+            label: 'Reefer Temp',
             value: '+7.9°C',
-            sub: 'VC-2048 Oncology Batch',
+            sub: 'VC-2048 Oncology',
             icon: ThermometerSnowflake,
             status: 'critical',
             badge: 'Near Limit',
-            color: 'text-rose-600 bg-rose-50'
+            color: 'text-[#FF3B30] bg-rose-50'
           },
           {
             id: 'customs',
             tab: 'shipments',
-            label: 'Customs Clearances',
+            label: 'E-Gate Clearances',
             value: '4 of 4 Ready',
-            sub: 'E-Gate passes issued',
+            sub: 'All Passes Issued',
             icon: FileCheck,
             status: 'normal',
-            badge: 'Cleared',
-            color: 'text-emerald-600 bg-emerald-50'
+            badge: '100% Cleared',
+            color: 'text-[#34C759] bg-emerald-50'
           }
         ];
 
@@ -82,52 +83,52 @@ export function KpiStrip({ onMetricClick, activeMetric, activeRole = 'all' }) {
             tab: 'ports',
             label: 'Port Congestion',
             value: '62%',
-            sub: 'Visakhapatnam (Peak 81% at +48h)',
+            sub: 'Vizag (Peak 81% at +48h)',
             icon: Anchor,
             status: 'warning',
             badge: '+9% 24h',
-            color: 'text-rose-600 bg-rose-50'
+            color: 'text-[#FF3B30] bg-rose-50'
           },
           {
             id: 'waiting',
             tab: 'ports',
             label: 'Anchorage Queue',
-            value: '7 Vessels',
-            sub: 'Outer Roads Alpha',
+            value: '7 Ships',
+            sub: 'Roads Alpha Area',
             icon: Ship,
             status: 'warning',
-            color: 'text-amber-600 bg-amber-50'
+            color: 'text-[#FF9500] bg-amber-50'
           },
           {
             id: 'berths',
             tab: 'ports',
-            label: 'Berths Available',
+            label: 'Available Berths',
             value: '2 of 18',
-            sub: 'Berth 04 priority reefer',
+            sub: 'Berth 04 Reefer Ready',
             icon: Anchor,
             status: 'normal',
-            badge: '2 Open',
-            color: 'text-emerald-600 bg-emerald-50'
+            badge: '2 Free',
+            color: 'text-[#34C759] bg-emerald-50'
           },
           {
             id: 'dwell',
             tab: 'ports',
             label: 'Avg Turnaround',
             value: '16.0 hrs',
-            sub: '+3.2h vs normal average',
+            sub: '+3.2h vs standard',
             icon: Activity,
             status: 'warning',
-            color: 'text-amber-600 bg-amber-50'
+            color: 'text-[#FF9500] bg-amber-50'
           },
           {
             id: 'trucks',
             tab: 'impact',
-            label: 'Trucks Waiting at Gate',
+            label: 'Waiting at Gate',
             value: '26 Rigs',
-            sub: 'Anakapalle & Gajuwaka',
+            sub: 'Anakapalle Staging',
             icon: Truck,
             status: 'warning',
-            color: 'text-blue-600 bg-blue-50'
+            color: 'text-[#007AFF] bg-blue-50'
           }
         ];
 
@@ -136,9 +137,9 @@ export function KpiStrip({ onMetricClick, activeMetric, activeRole = 'all' }) {
           {
             id: 'transit',
             tab: 'fleet',
-            label: 'Rigs on Corridor',
-            value: '184 Trucks',
-            sub: 'NH-65 / NH-44 routes active',
+            label: 'Corridor Rigs',
+            value: '184 Units',
+            sub: 'NH-65 Active Highway',
             icon: Truck,
             status: 'normal',
             color: 'text-slate-700 bg-slate-100'
@@ -146,45 +147,45 @@ export function KpiStrip({ onMetricClick, activeMetric, activeRole = 'all' }) {
           {
             id: 'empty',
             tab: 'backhaul',
-            label: 'Empty Return Trucks',
-            value: '26 Rigs',
-            sub: 'Unassigned deadhead runs',
+            label: 'Empty Return Rigs',
+            value: '26 Deadheads',
+            sub: 'Unassigned return runs',
             icon: Repeat,
             status: 'warning',
-            badge: 'Unassigned',
-            color: 'text-amber-600 bg-amber-50'
+            badge: 'Deadheads',
+            color: 'text-[#FF9500] bg-amber-50'
           },
           {
             id: 'matches',
             tab: 'backhaul',
-            label: 'Backhaul Load Matches',
+            label: 'Backhaul Matches',
             value: '11 Matches',
-            sub: 'Up to 94% match proximity',
+            sub: '94% Proximity Score',
             icon: Repeat,
             status: 'actionable',
-            badge: 'Ready to Assign',
-            color: 'text-emerald-600 bg-emerald-50'
+            badge: 'Ready to Book',
+            color: 'text-[#34C759] bg-emerald-50'
           },
           {
             id: 'deadhead',
             tab: 'analytics',
-            label: 'Empty Miles Saved',
+            label: 'Empty KM Saved',
             value: '4,896 KM',
-            sub: 'Past 7 days across corridor',
+            sub: 'Past 7 Days Saved',
             icon: TrendingUp,
             status: 'normal',
             badge: 'Saved',
-            color: 'text-sky-600 bg-sky-50'
+            color: 'text-[#007AFF] bg-sky-50'
           },
           {
             id: 'revenue',
             tab: 'backhaul',
-            label: 'Recovered Revenue',
+            label: 'Recovered Yield',
             value: '₹336,000',
-            sub: 'Estimated freight yield',
+            sub: 'Net Freight Gain',
             icon: DollarSign,
             status: 'normal',
-            color: 'text-emerald-600 bg-emerald-50'
+            color: 'text-[#34C759] bg-emerald-50'
           }
         ];
 
@@ -193,55 +194,55 @@ export function KpiStrip({ onMetricClick, activeMetric, activeRole = 'all' }) {
           {
             id: 'coldchain',
             tab: 'coldchain',
-            label: 'Critical Excursion Alert',
+            label: 'Thermal Excursion',
             value: '+7.9°C',
-            sub: 'VC-2048 Oncology Batch (Limit: 8°C)',
+            sub: 'VC-2048 (Limit +8°C)',
             icon: AlertTriangle,
             status: 'critical',
             badge: 'Critical',
-            color: 'text-rose-600 bg-rose-50'
+            color: 'text-[#FF3B30] bg-rose-50'
           },
           {
             id: 'watch',
             tab: 'coldchain',
-            label: 'Watch Status',
+            label: 'Watch Telemetry',
             value: '+6.8°C',
             sub: 'VC-3019 Vaccine Vials',
             icon: ThermometerSnowflake,
             status: 'warning',
             badge: 'Watch',
-            color: 'text-amber-600 bg-amber-50'
+            color: 'text-[#FF9500] bg-amber-50'
           },
           {
             id: 'stable',
             tab: 'coldchain',
-            label: 'Stable Reefers',
+            label: 'Stable Cold Units',
             value: '2 Reefers',
-            sub: 'VC-1044 (-18.4°C Deep Freeze)',
+            sub: 'VC-1044 (-18.4°C)',
             icon: CheckCircle2,
             status: 'normal',
             badge: 'Normal',
-            color: 'text-emerald-600 bg-emerald-50'
+            color: 'text-[#34C759] bg-emerald-50'
           },
           {
             id: 'compressor',
             tab: 'coldchain',
             label: 'Compressor Load',
             value: '82% Avg',
-            sub: 'Peak 98% under ambient heat',
+            sub: 'Peak 98% under sun',
             icon: Activity,
             status: 'warning',
-            color: 'text-blue-600 bg-blue-50'
+            color: 'text-[#007AFF] bg-blue-50'
           },
           {
             id: 'battery',
             tab: 'coldchain',
             label: 'Aux Battery Reserve',
             value: '6.5 Hours',
-            sub: 'Emergency boost ready',
+            sub: 'Emergency Boost',
             icon: CheckCircle2,
             status: 'normal',
-            color: 'text-emerald-600 bg-emerald-50'
+            color: 'text-[#34C759] bg-emerald-50'
           }
         ];
 
@@ -251,30 +252,30 @@ export function KpiStrip({ onMetricClick, activeMetric, activeRole = 'all' }) {
           {
             id: 'vessels',
             tab: 'vessels',
-            label: 'Ships in Corridor',
-            value: '24 Vessels',
+            label: 'Corridor Vessels',
+            value: '24 Ships',
             sub: '3 inbound to pilot',
             icon: Ship,
             status: 'normal',
-            color: 'text-blue-600 bg-blue-50'
+            color: 'text-[#007AFF] bg-blue-50'
           },
           {
             id: 'congestion',
             tab: 'ports',
             label: 'Port Congestion',
             value: '62% Avg',
-            sub: 'Peak 81% at Vizag (+48h)',
+            sub: 'Peak 81% Vizag (+48h)',
             icon: Anchor,
             status: 'warning',
             badge: '+9% 24h',
-            color: 'text-amber-600 bg-amber-50'
+            color: 'text-[#FF9500] bg-amber-50'
           },
           {
             id: 'transit',
             tab: 'fleet',
-            label: 'Trucks in Transit',
+            label: 'Highway Trucks',
             value: '184 Units',
-            sub: 'Active road corridors',
+            sub: 'NH-65 Active Rigs',
             icon: Truck,
             status: 'normal',
             color: 'text-slate-700 bg-slate-100'
@@ -282,20 +283,20 @@ export function KpiStrip({ onMetricClick, activeMetric, activeRole = 'all' }) {
           {
             id: 'empty',
             tab: 'backhaul',
-            label: 'Empty Return Trucks',
-            value: '26 Rigs',
-            sub: '11 load matches available',
+            label: 'Empty Return Rigs',
+            value: '26 Trucks',
+            sub: '11 load matches ready',
             icon: Repeat,
             status: 'actionable',
             badge: '11 Matches',
-            color: 'text-emerald-600 bg-emerald-50'
+            color: 'text-[#34C759] bg-emerald-50'
           },
           {
             id: 'shipments',
             tab: 'shipments',
-            label: 'Tracked Consignments',
+            label: 'Active Cargoes',
             value: '312 Cargoes',
-            sub: 'Sea-to-warehouse synced',
+            sub: 'Sea-to-Door Synced',
             icon: Package,
             status: 'normal',
             color: 'text-slate-700 bg-slate-100'
@@ -303,13 +304,13 @@ export function KpiStrip({ onMetricClick, activeMetric, activeRole = 'all' }) {
           {
             id: 'coldchain',
             tab: 'coldchain',
-            label: 'Cold-Chain Alerts',
+            label: 'Thermal Alerts',
             value: '3 Reefers',
             sub: '1 excursion risk (+7.9°C)',
             icon: AlertTriangle,
             status: 'critical',
             badge: '1 Critical',
-            color: 'text-rose-600 bg-rose-50'
+            color: 'text-[#FF3B30] bg-rose-50'
           }
         ];
     }
@@ -317,8 +318,13 @@ export function KpiStrip({ onMetricClick, activeMetric, activeRole = 'all' }) {
 
   const metrics = getMetricsByRole();
 
+  const handleCardClick = (m) => {
+    playIosChime('tap');
+    if (onMetricClick) onMetricClick(m.tab, m.id);
+  };
+
   return (
-    <div className="bg-slate-50/70 border-b border-slate-200 px-4 sm:px-6 py-2 flex items-center justify-between gap-3 shrink-0 overflow-x-auto no-scrollbar">
+    <div className="bg-[#F2F4F7] px-3 sm:px-6 py-1.5 flex items-center justify-between gap-2.5 shrink-0 overflow-x-auto no-scrollbar">
       <div className="flex items-center gap-2.5 w-full min-w-max">
         {metrics.map((m) => {
           const Icon = m.icon;
@@ -326,35 +332,35 @@ export function KpiStrip({ onMetricClick, activeMetric, activeRole = 'all' }) {
           return (
             <button
               key={m.id}
-              onClick={() => onMetricClick && onMetricClick(m.tab, m.id)}
-              className={`flex items-center gap-3 px-3 py-1.5 rounded-lg border text-left transition-all cursor-pointer ${
+              onClick={() => handleCardClick(m)}
+              className={`flex items-center gap-3 px-3.5 py-2 rounded-2xl border text-left transition-all cursor-pointer ios-btn ${
                 isActive 
-                  ? 'bg-white border-slate-400 shadow-xs ring-1 ring-slate-400' 
-                  : 'bg-white hover:bg-slate-100/60 border-slate-200'
+                  ? 'bg-white border-[#007AFF]/40 shadow-sm ring-2 ring-[#007AFF]/20' 
+                  : 'bg-white/80 hover:bg-white border-black/[0.05] shadow-2xs hover:shadow-xs'
               }`}
               title={`View ${m.label}`}
             >
-              <div className={`p-1.5 rounded-md shrink-0 ${m.color}`}>
+              <div className={`p-2 rounded-xl shrink-0 ${m.color}`}>
                 <Icon className="w-4 h-4" />
               </div>
 
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-slate-900">
+                  <span className="text-xs font-extrabold text-slate-900 tracking-tight">
                     {m.value}
                   </span>
                   {m.badge && (
-                    <span className={`text-[9.5px] font-semibold px-1.5 py-0.2 rounded ${
-                      m.status === 'critical' ? 'bg-rose-100 text-rose-700' :
-                      m.status === 'actionable' ? 'bg-emerald-100 text-emerald-800' :
-                      m.status === 'warning' ? 'bg-amber-100 text-amber-800' :
+                    <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full ${
+                      m.status === 'critical' ? 'bg-[#FF3B30]/15 text-[#FF3B30]' :
+                      m.status === 'actionable' ? 'bg-[#34C759]/15 text-[#34C759]' :
+                      m.status === 'warning' ? 'bg-[#FF9500]/15 text-[#FF9500]' :
                       'bg-slate-100 text-slate-700'
                     }`}>
                       {m.badge}
                     </span>
                   )}
                 </div>
-                <div className="text-[10px] text-slate-500 font-medium">
+                <div className="text-[10px] text-slate-500 font-semibold tracking-tight">
                   {m.label}
                 </div>
               </div>

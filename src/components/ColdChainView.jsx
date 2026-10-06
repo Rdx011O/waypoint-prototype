@@ -3,6 +3,7 @@ import { COLD_CHAIN_MONITORING } from '../data/mockData';
 import { ThermometerSnowflake, AlertTriangle, ShieldCheck, BatteryCharging, Zap, ArrowRight, CheckCircle2, RotateCcw, Sparkles } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { useToast } from './ToastNotification';
+import { playIosChime } from './DynamicIslandHabitBar';
 
 export function ColdChainView({ onSelectAsset, activeRole = 'all' }) {
   const [selectedId, setSelectedId] = useState('VC-2048');
@@ -12,6 +13,7 @@ export function ColdChainView({ onSelectAsset, activeRole = 'all' }) {
   const activeReefer = COLD_CHAIN_MONITORING.find(r => r.id === selectedId) || COLD_CHAIN_MONITORING[0];
 
   const handleOverrideAux = () => {
+    playIosChime('alert');
     setOverrideTriggered(true);
     addToast({
       type: 'success',
@@ -21,19 +23,19 @@ export function ColdChainView({ onSelectAsset, activeRole = 'all' }) {
   };
 
   return (
-    <div className="bg-slate-50/60 p-4 sm:p-6 flex flex-col h-full overflow-y-auto space-y-4">
+    <div className="bg-transparent p-3 sm:p-5 flex flex-col h-full overflow-y-auto space-y-4">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-slate-200 gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-black/[0.05] gap-3">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-teal-50 text-teal-700">
+            <div className="w-10 h-10 rounded-2xl bg-teal-50 text-[#30B0C7] flex items-center justify-center border border-teal-100 shadow-2xs">
               <ThermometerSnowflake className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold text-slate-900">
+              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
                 Cold-Chain Surveillance & Reefer IoT
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 font-medium">
                 Real-time thermal telemetry curves, compressor duty cycles, and emergency cooling overrides
               </p>
             </div>
@@ -41,26 +43,27 @@ export function ColdChainView({ onSelectAsset, activeRole = 'all' }) {
         </div>
 
         {/* Reefer Selector Tabs */}
-        <div className="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-slate-200 overflow-x-auto no-scrollbar shadow-2xs">
+        <div className="flex items-center gap-1.5 bg-slate-200/60 p-1 rounded-full border border-black/5 overflow-x-auto no-scrollbar shadow-2xs">
           {COLD_CHAIN_MONITORING.map(r => (
             <button
               key={r.id}
               onClick={() => {
+                playIosChime('tap');
                 setSelectedId(r.id);
                 setOverrideTriggered(false);
                 if (onSelectAsset) onSelectAsset({ ...r, assetType: 'coldchain' });
               }}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ios-btn ${
                 selectedId === r.id
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <span>{r.id}</span>
-              <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
-                r.riskLevel === 'CRITICAL' ? 'bg-rose-500 text-white' :
-                r.riskLevel === 'WARNING' ? 'bg-amber-500 text-white' :
-                'bg-emerald-600 text-white'
+              <span className={`px-2 py-0.2 rounded-full text-[9.5px] font-extrabold ${
+                r.riskLevel === 'CRITICAL' ? 'bg-[#FF3B30] text-white' :
+                r.riskLevel === 'WARNING' ? 'bg-[#FF9500] text-white' :
+                'bg-[#34C759] text-white'
               }`}>
                 {r.currentTemp > 0 ? `+${r.currentTemp}°C` : `${r.currentTemp}°C`}
               </span>
@@ -70,24 +73,24 @@ export function ColdChainView({ onSelectAsset, activeRole = 'all' }) {
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start flex-1">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start flex-1">
         {/* Left Column: Temperature Graph & Override Controls */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-1">
+          <div className="bg-white border border-black/[0.05] rounded-3xl p-5 shadow-2xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-black/[0.05] gap-1">
               <div>
-                <h2 className="text-sm font-bold text-slate-900">
+                <h2 className="text-sm font-extrabold text-slate-900 tracking-tight">
                   Sensor Temperature Curve (Past 6 Hours)
                 </h2>
-                <div className="text-xs text-slate-500">
+                <div className="text-xs text-slate-500 font-medium">
                   Safe Threshold Range: [{activeReefer.safeRangeMin}°C — {activeReefer.safeRangeMax}°C]
                 </div>
               </div>
 
-              <span className={`px-2.5 py-1 rounded-full text-xs font-bold self-start sm:self-auto ${
-                activeReefer.riskLevel === 'CRITICAL' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
-                activeReefer.riskLevel === 'WARNING' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                'bg-emerald-50 text-emerald-700 border border-emerald-200'
+              <span className={`px-2.5 py-1 rounded-full text-[9.5px] font-extrabold self-start sm:self-auto ${
+                activeReefer.riskLevel === 'CRITICAL' ? 'bg-[#FF3B30]/15 text-[#FF3B30]' :
+                activeReefer.riskLevel === 'WARNING' ? 'bg-[#FF9500]/15 text-[#FF9500]' :
+                'bg-[#34C759]/15 text-[#34C759]'
               }`}>
                 {activeReefer.statusLabel}
               </span>
