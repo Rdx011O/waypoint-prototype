@@ -14,12 +14,23 @@ import {
   ExternalLink,
   ShieldCheck,
   Zap,
-  Radio
+  Radio,
+  Clock,
+  Sparkles,
+  TrendingDown,
+  TrendingUp,
+  FileCheck
 } from 'lucide-react';
 import { useToast } from './ToastNotification';
 import { playIosChime } from './DynamicIslandHabitBar';
 
-export function ContextPanel({ selectedAsset, onClose, onTriggerImpactView, onJumpToTab }) {
+export function ContextPanel({ 
+  selectedAsset, 
+  onClose, 
+  onTriggerImpactView, 
+  onJumpToTab,
+  onOpenSandbox 
+}) {
   const { addToast } = useToast();
 
   if (!selectedAsset) return null;
@@ -99,6 +110,20 @@ export function ContextPanel({ selectedAsset, onClose, onTriggerImpactView, onJu
               </div>
             </div>
 
+            {/* D&D Free Time Risk Countdown */}
+            <div className="p-3 rounded-2xl bg-slate-50 border border-black/[0.05] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#0071E3]" />
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">D&D FREE TIME</span>
+                  <span className="font-bold text-slate-900 text-xs">2 Days 14 Hrs Left</span>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded">
+                $0 Penalty Accrued
+              </span>
+            </div>
+
             {selectedAsset.hasException ? (
               <div className="p-3.5 bg-rose-50/90 border border-rose-200/80 rounded-2xl text-slate-800 space-y-1.5 shadow-2xs">
                 <div className="font-extrabold flex items-center gap-1.5 text-xs text-[#FF3B30]">
@@ -122,6 +147,33 @@ export function ContextPanel({ selectedAsset, onClose, onTriggerImpactView, onJu
               </div>
             )}
 
+            {/* IoT Temperature Mini Sparkline */}
+            {selectedAsset.currentTemp && (
+              <div className="p-3.5 bg-slate-900 text-white rounded-2xl border border-black/10 space-y-2">
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <ThermometerSnowflake className="w-3 h-3 text-[#38BDF8]" />
+                    6H IoT Temp Telemetry
+                  </span>
+                  <span className="font-mono font-bold text-amber-400">{selectedAsset.currentTemp}</span>
+                </div>
+                <div className="flex items-end gap-1.5 h-8 pt-1">
+                  {[4.2, 4.8, 5.5, 6.1, 7.2, 7.9].map((val, idx) => (
+                    <div key={idx} className="flex-1 flex flex-col items-center gap-1">
+                      <div 
+                        className={`w-full rounded-xs transition-all ${val > 7.5 ? 'bg-rose-500' : val > 6.0 ? 'bg-amber-400' : 'bg-[#38BDF8]'}`}
+                        style={{ height: `${(val / 8.5) * 100}%` }}
+                      ></div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between text-[9px] font-mono text-slate-400 border-t border-white/10 pt-1">
+                  <span>-6h (4.2°C)</span>
+                  <span className="text-rose-400 font-bold">Now (+7.9°C)</span>
+                </div>
+              </div>
+            )}
+
             <div className="p-3.5 bg-white rounded-2xl border border-black/[0.05] space-y-2 shadow-2xs">
               <div className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Consignment Profile</div>
               <div className="space-y-2 text-xs">
@@ -137,14 +189,6 @@ export function ContextPanel({ selectedAsset, onClose, onTriggerImpactView, onJu
                   <span className="text-slate-500 font-medium">Customs Clearance:</span>
                   <span className="font-bold text-[#34C759]">{selectedAsset.customsStatus || 'Cleared'}</span>
                 </div>
-                {selectedAsset.currentTemp && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-500 font-medium">Reefer Core Temp:</span>
-                    <span className={`font-bold font-mono ${selectedAsset.hasException ? 'text-[#FF3B30]' : 'text-[#34C759]'}`}>
-                      {selectedAsset.currentTemp}
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -232,6 +276,18 @@ export function ContextPanel({ selectedAsset, onClose, onTriggerImpactView, onJu
               </div>
             </div>
 
+            {/* Strategic Sandbox Trigger */}
+            <button
+              onClick={() => {
+                playIosChime('tap');
+                if (onOpenSandbox) onOpenSandbox();
+              }}
+              className="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 text-[#5856D6] border border-indigo-200 rounded-full font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Simulate "What-If" Rerouting Sandbox</span>
+            </button>
+
             <button
               onClick={() => {
                 playIosChime('alert');
@@ -272,6 +328,17 @@ export function ContextPanel({ selectedAsset, onClose, onTriggerImpactView, onJu
                 <span className="font-bold text-slate-900">{selectedAsset.cargoTonnage}</span>
               </div>
             </div>
+
+            <button
+              onClick={() => {
+                playIosChime('tap');
+                if (onOpenSandbox) onOpenSandbox();
+              }}
+              className="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-[#5856D6] border border-indigo-200 rounded-full font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Simulate Alternate Port Diversion</span>
+            </button>
 
             <button
               onClick={() => {

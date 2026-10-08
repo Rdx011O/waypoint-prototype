@@ -22,10 +22,17 @@ import {
   Building2,
   Package,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  CloudRain,
+  Wind,
+  Waves,
+  Clock,
+  RotateCcw,
+  Sparkles
 } from 'lucide-react';
+import { playIosChime } from './DynamicIslandHabitBar';
 
-export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, activeRole = 'all' }) {
+export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, activeReroute, activeRole = 'all' }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const currentTileLayerRef = useRef(null);
@@ -36,15 +43,17 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
     ports: null,
     vessels: null,
     trucks: null,
-    warehouses: null
+    warehouses: null,
+    weather: null
   });
 
   const [activeBasemap, setActiveBasemap] = useState('nautical_dark');
   const [isSimulating, setIsSimulating] = useState(true);
   const [simTick, setSimTick] = useState(0);
+  const [timeOffsetHours, setTimeOffsetHours] = useState(0); // -24 to +72
+  const [isTimelinePlaying, setIsTimelinePlaying] = useState(false);
   const [cursorCoords, setCursorCoords] = useState({ lat: 17.6868, lng: 83.2185 });
   const [vesselTypeFilter, setVesselTypeFilter] = useState('ALL');
-  const [isLayersPanelOpen, setIsLayersPanelOpen] = useState(false);
   const [activeLayerFilters, setActiveLayerFilters] = useState({
     ports: true,
     vessels: true,
@@ -52,17 +61,21 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
     trucks: true,
     warehouses: true,
     routes: true,
-    anchorage: true
+    anchorage: true,
+    weather: true
   });
 
   // Real-time simulated AIS movements
   useEffect(() => {
-    if (!isSimulating) return;
+    if (!isSimulating && !isTimelinePlaying) return;
     const timer = setInterval(() => {
       setSimTick(t => (t + 1) % 1000);
-    }, 2000);
+      if (isTimelinePlaying) {
+        setTimeOffsetHours(prev => (prev < 72 ? prev + 1 : -24));
+      }
+    }, isTimelinePlaying ? 600 : 2000);
     return () => clearInterval(timer);
-  }, [isSimulating]);
+  }, [isSimulating, isTimelinePlaying]);
 
   // Initialize Leaflet Map
   useEffect(() => {
@@ -94,7 +107,6 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
     currentTileLayerRef.current = tileLayer;
     mapInstanceRef.current = map;
 
-    // Trigger map invalidation on window resize for responsive canvas
     const handleResize = () => {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.invalidateSize();
@@ -139,6 +151,60 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
     });
 
     const isDark = activeBasemap === 'nautical_dark';
+
+    // 0. Weather & Monsoon Sea State Overlay
+    if (activeLayerFilters.weather) {
+      const weatherGroup = L.layerGroup();
+
+      // Cyclonic low-pressure depression zone in Central Bay of Bengal
+      L.circle([16.4, 86.8], {
+        radius: 140000,
+        color: '#F59E0B',
+        weight: 1.5,
+        dashArray: '4, 8',
+        fillColor: '#F59E0B',
+        fillOpacity: isDark ? 0.08 : 0.05
+      }).bindTooltip(`
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+          <strong style="color: #D97706;">⛈️ CYCLONIC DEPRESSION BOB-04</strong><br/>
+          Sustained Wind: 32 Knots (Beaufort 7)<br/>
+          Wave Swell: <span style="color:#DC2626; font-weight:bold;">3.8m Rough</span><br/>
+          Corridor Impact: Minor vessel SOG drag (-1.2 kn)
+        </div>
+      `, { sticky: true }).addTo(weatherGroup);
+
+      // Monsoon Swell Vector Marker
+      const weatherIcon = L.divIcon({
+        className: 'weather-indicator-marker',
+        html: `
+          <div style="
+            background: ${isDark ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.9)'};
+            color: ${isDark ? '#38BDF8' : '#0284C7'};
+            border: 1px solid #38BDF8;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            white-space: nowrap;
+          ">
+            <span>🌊 Swell: 3.4m</span>
+            <span style="color:#86868B;">•</span>
+            <span>💨 28 kn SW</span>
+          </div>
+        `,
+        iconSize: [130, 24],
+        iconAnchor: [65, 12]
+      });
+
+      L.marker([16.1, 85.5], { icon: weatherIcon }).addTo(weatherGroup);
+
+      weatherGroup.addTo(map);
+      layersRef.current.weather = weatherGroup;
+    }
 
     // 1. Outer Anchorage Zones & Pilot Stations
     if (activeLayerFilters.anchorage) {
@@ -191,7 +257,6 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
     if (activeLayerFilters.shippingTrunks) {
       const trunkGroup = L.layerGroup();
 
-      // East-West Global Trunk Line
       L.polyline(CORRIDOR_POLYLINES.sea_trunk_malacca_srilanka, {
         color: isDark ? '#A78BFA' : '#7C3AED',
         weight: 3,
@@ -199,7 +264,6 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
         opacity: isDark ? 0.85 : 0.75
       }).bindTooltip("<div style='font-family:IBM Plex Mono; font-size:10px;'><strong>GLOBAL EAST-WEST TRUNK ROUTE</strong><br/>Malacca Strait ➔ Colombo ➔ Suez</div>", { sticky: true }).addTo(trunkGroup);
 
-      // Singapore to Haldia Northern Route
       L.polyline(CORRIDOR_POLYLINES.sea_singapore_haldia, {
         color: isDark ? '#38BDF8' : '#0284C7',
         weight: 2,
@@ -207,7 +271,6 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
         opacity: isDark ? 0.75 : 0.65
       }).bindTooltip("<div style='font-family:IBM Plex Mono; font-size:10px;'>Singapore ➔ Sandheads / Haldia Port</div>", { sticky: true }).addTo(trunkGroup);
 
-      // East Coast Coastal Feeder Trunk
       L.polyline(CORRIDOR_POLYLINES.sea_coastal_feeder_trunk, {
         color: isDark ? '#34D399' : '#059669',
         weight: 2,
@@ -215,52 +278,80 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
         opacity: isDark ? 0.8 : 0.7
       }).bindTooltip("<div style='font-family:IBM Plex Mono; font-size:10px;'>East Coast Coastal Feeder (Chennai-Vizag-Paradip)</div>", { sticky: true }).addTo(trunkGroup);
 
-      // Andaman Sea Security Route
-      L.polyline(CORRIDOR_POLYLINES.sea_andaman_passage, {
-        color: isDark ? '#94A3B8' : '#64748B',
-        weight: 1.5,
-        dashArray: '3, 6',
-        opacity: 0.6
-      }).addTo(trunkGroup);
-
       trunkGroup.addTo(map);
       layersRef.current.shippingTrunks = trunkGroup;
     }
 
-    // 3. Multi-Modal Corridors (Sea & Highway Lines)
+    // 3. Multi-Modal Corridors
     if (activeLayerFilters.routes) {
       const routeGroup = L.layerGroup();
 
-      // Primary Sea Lane: Singapore -> Vizag
+            const isKpctRerouteActive = activeReroute === 'KPCT' || highlightedCorridor === 'CORRIDOR-KPCT-HYD';
+
+      // Singapore to Vizag Sea Trunk
       L.polyline(CORRIDOR_POLYLINES.sea_singapore_vizag, {
-        color: highlightedCorridor === 'CORRIDOR-VIZAG-HYD' || !highlightedCorridor ? (isDark ? '#38BDF8' : '#086788') : '#64748B',
-        weight: highlightedCorridor === 'CORRIDOR-VIZAG-HYD' ? 3.5 : 2,
-        dashArray: '6, 10',
-        opacity: 0.9
+        color: isKpctRerouteActive ? (isDark ? '#475569' : '#94A3B8') : (isDark ? '#38BDF8' : '#086788'),
+        weight: isKpctRerouteActive ? 2 : 3.5,
+        dashArray: isKpctRerouteActive ? '4, 8' : '6, 10',
+        opacity: isKpctRerouteActive ? 0.45 : 0.9
       }).addTo(routeGroup);
 
-      // Sea Lane: Colombo -> Chennai
-      L.polyline(CORRIDOR_POLYLINES.sea_colombo_chennai, {
-        color: isDark ? '#38BDF8' : '#086788',
-        weight: 2,
-        dashArray: '6, 10',
-        opacity: 0.8
-      }).addTo(routeGroup);
-
-      // Sea Lane: Klang -> Paradip
-      L.polyline(CORRIDOR_POLYLINES.sea_klang_paradip, {
-        color: isDark ? '#38BDF8' : '#086788',
-        weight: 2,
-        dashArray: '6, 10',
-        opacity: 0.8
-      }).addTo(routeGroup);
-
-      // Land Highways (NH-65, NH-44, NH-48, NH-53)
+      // Vizag to Hyderabad Land Trunk
       L.polyline(CORRIDOR_POLYLINES.land_vizag_hyderabad, {
-        color: highlightedCorridor === 'CORRIDOR-VIZAG-HYD' || !highlightedCorridor ? (isDark ? '#F59E0B' : '#0D3B66') : '#64748B',
-        weight: highlightedCorridor === 'CORRIDOR-VIZAG-HYD' ? 4 : 2.5,
-        opacity: 0.95
+        color: isKpctRerouteActive ? (isDark ? '#475569' : '#94A3B8') : (isDark ? '#F59E0B' : '#0D3B66'),
+        weight: isKpctRerouteActive ? 2 : 4,
+        opacity: isKpctRerouteActive ? 0.45 : 0.95
       }).addTo(routeGroup);
+
+      // KPCT Sea Diversion Trunk (Dynamic)
+      if (CORRIDOR_POLYLINES.sea_singapore_kpct) {
+        L.polyline(CORRIDOR_POLYLINES.sea_singapore_kpct, {
+          color: isKpctRerouteActive ? '#10B981' : (isDark ? '#334155' : '#CBD5E1'),
+          weight: isKpctRerouteActive ? 4 : 1.5,
+          dashArray: isKpctRerouteActive ? '5, 8' : '3, 6',
+          opacity: isKpctRerouteActive ? 1 : 0.35
+        }).bindTooltip("<div style='font-family:IBM Plex Mono; font-size:10px;'>⚡ KPCT Sea Diversion Leg (+145 NM)</div>", { sticky: true }).addTo(routeGroup);
+      }
+
+      // KPCT Land Fast-Track Corridor (Dynamic)
+      if (CORRIDOR_POLYLINES.land_kpct_hyderabad) {
+        L.polyline(CORRIDOR_POLYLINES.land_kpct_hyderabad, {
+          color: isKpctRerouteActive ? '#10B981' : (isDark ? '#334155' : '#CBD5E1'),
+          weight: isKpctRerouteActive ? 4.5 : 1.5,
+          opacity: isKpctRerouteActive ? 1 : 0.35
+        }).bindTooltip("<div style='font-family:IBM Plex Mono; font-size:10px;'>⚡ KPCT ➔ Hyderabad NH-16/NH-765 (-170 KM Express)</div>", { sticky: true }).addTo(routeGroup);
+      }
+
+      // Dynamic Diversion Callout Marker on Map
+      if (isKpctRerouteActive) {
+        const rerouteCalloutIcon = L.divIcon({
+          className: 'kpct-reroute-pill',
+          html: `
+            <div style="
+              background: #10B981;
+              color: #FFFFFF;
+              padding: 3px 8px;
+              border-radius: 9999px;
+              font-family: 'IBM Plex Mono', monospace;
+              font-size: 9px;
+              font-weight: 800;
+              letter-spacing: 0.3px;
+              white-space: nowrap;
+              box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45);
+              border: 1.5px solid #FFFFFF;
+              display: flex;
+              align-items: center;
+              gap: 4px;
+            ">
+              <span>⚡</span>
+              <span>DIVERSION ACTIVE: KPCT EXPRESS (-170 KM)</span>
+            </div>
+          `,
+          iconSize: [210, 24],
+          iconAnchor: [105, 12]
+        });
+        L.marker([15.4000, 81.6000], { icon: rerouteCalloutIcon }).addTo(routeGroup);
+      }
 
       L.polyline(CORRIDOR_POLYLINES.land_hyderabad_nagpur, {
         color: isDark ? '#10B981' : '#059669',
@@ -285,13 +376,21 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
       layersRef.current.routes = routeGroup;
     }
 
-    // 4. Ports with Congestion Indicators
+    // 4. Ports with Dynamic Time-Scrubbed Congestion
     if (activeLayerFilters.ports) {
       const portGroup = L.layerGroup();
 
       PORTS.forEach(port => {
         const isSelected = selectedAsset && selectedAsset.id === port.id;
-        const isHighCongestion = port.congestion > 60;
+        
+        // Calculate dynamic congestion delta based on time scrubber
+        let dynamicCongestion = port.congestion;
+        if (port.id === 'PORT-VTZ') {
+          if (timeOffsetHours > 0) dynamicCongestion = Math.min(94, Math.round(port.congestion + (timeOffsetHours * 0.4)));
+          else if (timeOffsetHours < 0) dynamicCongestion = Math.max(52, Math.round(port.congestion + (timeOffsetHours * 0.8)));
+        }
+
+        const isHighCongestion = dynamicCongestion > 60;
         const badgeColor = isHighCongestion ? '#EF4444' : isDark ? '#0284C7' : '#0D3B66';
 
         const customPortIcon = L.divIcon({
@@ -310,9 +409,9 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
               gap: 5px;
               white-space: nowrap;
               transform: ${isSelected ? 'scale(1.18)' : 'scale(1)'};
-              transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+              transition: transform 0.2s ease;
             ">
-              <span style="color: ${badgeColor}; font-weight: bold;">⚓</span>
+              <span style="color: ${badgeColor}; font-weight: bold; font-size: 11px;">⚓</span>
               <div style="display: flex; flex-direction: column; line-height: 1;">
                 <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">${port.shortName.toUpperCase()}</span>
                 <span style="font-size: 8px; color: ${isDark ? '#94A3B8' : '#64748B'};">${port.code} • ${port.waitingVessels} Vess</span>
@@ -326,12 +425,12 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
                 border-radius: 2px;
                 margin-left: 2px;
               ">
-                ${port.congestion}%
+                ${dynamicCongestion}%
               </span>
             </div>
           `,
-          iconSize: [130, 28],
-          iconAnchor: [65, 14]
+          iconSize: [118, 26],
+          iconAnchor: [59, 13]
         });
 
         const marker = L.marker([port.lat, port.lng], { icon: customPortIcon })
@@ -343,7 +442,7 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
       layersRef.current.ports = portGroup;
     }
 
-    // 5. Dense Vessel Fleet AIS Markers
+    // 5. Vessels with Time-Interpolated Positions
     if (activeLayerFilters.vessels) {
       const vesselGroup = L.layerGroup();
 
@@ -356,13 +455,17 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
         const isSelected = selectedAsset && selectedAsset.id === vessel.id;
         const isDelayed = vessel.status === 'delayed';
 
-        // Animated position offset
+        // Time scrubber progression interpolation
+        const timeFraction = timeOffsetHours / 72;
+        const latTimeProgression = (vessel.destinationLat ? (vessel.destinationLat - vessel.lat) * timeFraction * 0.6 : 0);
+        const lngTimeProgression = (vessel.destinationLng ? (vessel.destinationLng - vessel.lng) * timeFraction * 0.6 : 0);
+
         const latOffset = isSimulating ? Math.sin((simTick + vIdx * 35) * 0.05) * 0.008 : 0;
         const lngOffset = isSimulating ? Math.cos((simTick + vIdx * 35) * 0.05) * 0.008 : 0;
-        const currentLat = vessel.lat + latOffset;
-        const currentLng = vessel.lng + lngOffset;
+        
+        const currentLat = vessel.lat + latOffset + latTimeProgression;
+        const currentLng = vessel.lng + lngOffset + lngTimeProgression;
 
-        // Color coding by vessel category
         let color = '#0284C7';
         if (vessel.category === 'Tanker') color = '#E11D48';
         else if (vessel.category === 'Gas Carrier') color = '#8B5CF6';
@@ -398,8 +501,8 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
               ${isDelayed ? '<span style="background:#EF4444; color:#FFF; font-size:7px; font-weight:bold; padding:0 2px; border-radius:1px;">DELAY</span>' : ''}
             </div>
           `,
-          iconSize: [140, 26],
-          iconAnchor: [70, 13]
+          iconSize: [126, 24],
+          iconAnchor: [63, 12]
         });
 
         const marker = L.marker([currentLat, currentLng], { icon: vesselIcon })
@@ -409,10 +512,10 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
           <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; line-height: 1.4;">
             <strong style="color:${color}; font-size:11px;">${vessel.name}</strong> (${vessel.imo})<br/>
             Type: ${vessel.type}<br/>
-            Speed/Course: ${vessel.speed} • ${vessel.cog}<br/>
-            Draught: ${vessel.draftMeters}m • LOA: ${vessel.lengthMeters}m<br/>
+            Speed: ${vessel.speed} • Course: ${vessel.cog}<br/>
             Destination: <strong>${vessel.destination}</strong><br/>
             ETA: ${vessel.eta}<br/>
+            ${timeOffsetHours !== 0 ? `<span style="color:#38BDF8; font-weight:bold;">Forecast Timeline: ${timeOffsetHours > 0 ? `+${timeOffsetHours}h` : `${timeOffsetHours}h`}</span><br/>` : ''}
             Status: <span style="font-weight:bold;">${vessel.statusDetail || vessel.status}</span>
           </div>
         `, { sticky: true });
@@ -448,16 +551,14 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
               align-items: center;
               gap: 3px;
               white-space: nowrap;
-              transform: ${isSelected ? 'scale(1.22)' : 'scale(1)'};
+              transform: ${isSelected ? 'scale(1.2)' : 'scale(1)'};
             ">
-              <span style="font-size: 10px;">🚛</span>
-              <span style="font-size: 9px; font-weight: 700;">${truck.id}</span>
-              ${isHold ? '<span style="background:#EF4444; color:#FFF; font-size:7px; font-weight:bold; padding:0 2px; border-radius:1px;">HOLD</span>' : ''}
-              ${isEmpty ? '<span style="background:#F59E0B; color:#000; font-size:7px; font-weight:bold; padding:0 2px; border-radius:1px;">EMPTY</span>' : ''}
+              <span style="color: ${color}; font-size: 9px;">🚛</span>
+              <span style="font-size: 8.5px; font-weight: bold;">${truck.id}</span>
             </div>
           `,
-          iconSize: [90, 22],
-          iconAnchor: [45, 11]
+          iconSize: [82, 18],
+          iconAnchor: [41, 9]
         });
 
         const marker = L.marker([truck.lat, truck.lng], { icon: truckIcon })
@@ -479,22 +580,22 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
               background: ${isDark ? '#0F172A' : '#FFFFFF'};
               color: ${isDark ? '#F8FAFC' : '#0F172A'};
               padding: 2px 6px;
-              border-radius: 3px;
-              border: 1.5px solid #10B981;
-              box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+              border-radius: 4px;
+              border: 1.5px solid #30B0C7;
               font-family: 'IBM Plex Mono', monospace;
               display: flex;
               align-items: center;
               gap: 4px;
-              white-space: nowrap;
+              font-size: 9px;
+              box-shadow: 0 3px 8px rgba(0,0,0,${isDark ? '0.5' : '0.15'});
               transform: ${isSelected ? 'scale(1.15)' : 'scale(1)'};
             ">
-              <span style="color:#10B981; font-weight:bold;">🏢</span>
-              <span style="font-size: 9px; font-weight: 700;">${wh.city.toUpperCase()} WH</span>
+              <span style="color: #30B0C7;">🏭</span>
+              <span style="font-weight: 700;">${wh.shortName}</span>
             </div>
           `,
-          iconSize: [105, 22],
-          iconAnchor: [52, 11]
+          iconSize: [110, 22],
+          iconAnchor: [55, 11]
         });
 
         const marker = L.marker([wh.lat, wh.lng], { icon: whIcon })
@@ -505,7 +606,7 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
       layersRef.current.warehouses = whGroup;
     }
 
-  }, [activeLayerFilters, activeBasemap, selectedAsset, highlightedCorridor, simTick, isSimulating, vesselTypeFilter]);
+  }, [activeLayerFilters, activeBasemap, selectedAsset, highlightedCorridor, activeReroute, simTick, isSimulating, vesselTypeFilter, timeOffsetHours]);
 
   const toggleLayer = (key) => {
     setActiveLayerFilters(prev => ({ ...prev, [key]: !prev[key] }));
@@ -609,6 +710,7 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
 
           {[
             { key: 'vessels', label: 'AIS Vessels', color: 'bg-[#0071E3]' },
+            { key: 'weather', label: 'Weather / Swells', color: 'bg-[#F59E0B]' },
             { key: 'shippingTrunks', label: 'Shipping Trunks', color: 'bg-[#5E5CE6]' },
             { key: 'ports', label: 'Major Ports', color: 'bg-[#FF3B30]' },
             { key: 'anchorage', label: 'Anchorages', color: 'bg-[#30B0C7]' },
@@ -633,7 +735,7 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
           ))}
         </div>
 
-        {/* Apple Maps Style Vertical Floating Zoom Control */}
+        {/* Vertical Floating Zoom Control */}
         <div className="apple-card shadow-md flex flex-col divide-y divide-black/[0.06] overflow-hidden">
           <button
             onClick={() => mapInstanceRef.current && mapInstanceRef.current.zoomIn()}
@@ -659,13 +761,76 @@ export function MapView({ selectedAsset, onSelectAsset, highlightedCorridor, act
         </div>
       </div>
 
-      {/* Bottom Floating Telemetry Capsule */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[400] apple-glass px-4 py-1.5 rounded-full text-xs text-[#1D1D1F] shadow-lg flex items-center gap-2 max-w-[90%] truncate">
-        <Crosshair className="w-3.5 h-3.5 text-[#0071E3] shrink-0" />
-        <span className="font-mono text-[11px]">
-          {cursorCoords.lat.toFixed(4)}°N, {cursorCoords.lng.toFixed(4)}°E
-        </span>
-        <span className="text-[#86868B] hidden md:inline">• Bay of Bengal Corridor Sync Active</span>
+      {/* Floating 72-Hour Time Scrubber Bar (Bottom Center) */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[400] apple-glass p-2.5 sm:px-4 sm:py-2.5 rounded-2xl shadow-xl border border-black/[0.08] flex flex-col sm:flex-row items-center gap-2 sm:gap-4 max-w-[94%] sm:max-w-2xl w-full">
+        {/* Play/Pause & Reset Controls */}
+        <div className="flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
+          <button
+            onClick={() => {
+              playIosChime('tap');
+              setIsTimelinePlaying(!isTimelinePlaying);
+            }}
+            className="p-1.5 rounded-lg bg-white shadow-2xs border border-black/5 text-[#0071E3] hover:bg-blue-50 transition-colors cursor-pointer"
+            title={isTimelinePlaying ? 'Pause Timeline' : 'Play 72h Forecast Replay'}
+          >
+            {isTimelinePlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+          </button>
+
+          <button
+            onClick={() => {
+              playIosChime('tap');
+              setTimeOffsetHours(0);
+              setIsTimelinePlaying(false);
+            }}
+            className="p-1.5 rounded-lg bg-white shadow-2xs border border-black/5 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer text-[10px] font-mono font-bold flex items-center gap-1"
+            title="Reset to LIVE Current Time"
+          >
+            <RotateCcw className="w-3 h-3" />
+            <span className="hidden sm:inline">LIVE</span>
+          </button>
+        </div>
+
+        {/* Time Slider */}
+        <div className="flex-1 w-full flex flex-col gap-1">
+          <div className="flex items-center justify-between text-[10.5px] font-mono">
+            <span className="text-slate-500 font-semibold flex items-center gap-1">
+              <Clock className="w-3 h-3 text-[#0071E3]" />
+              <span>TIME MACHINE:</span>
+            </span>
+            <span className={`font-bold px-2 py-0.5 rounded-md ${
+              timeOffsetHours === 0 
+                ? 'bg-emerald-100 text-emerald-800' 
+                : timeOffsetHours > 0 
+                ? 'bg-blue-100 text-[#0071E3]' 
+                : 'bg-amber-100 text-amber-800'
+            }`}>
+              {timeOffsetHours === 0 ? '● NOW (Live Synchronized)' : timeOffsetHours > 0 ? `+${timeOffsetHours}h Predictive Forecast` : `${timeOffsetHours}h Historical Replay`}
+            </span>
+          </div>
+
+          <div className="relative flex items-center">
+            <input
+              type="range"
+              min="-24"
+              max="72"
+              step="1"
+              value={timeOffsetHours}
+              onChange={(e) => {
+                setTimeOffsetHours(Number(e.target.value));
+                if (isTimelinePlaying) setIsTimelinePlaying(false);
+              }}
+              className="w-full accent-[#0071E3] cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+            />
+          </div>
+
+          <div className="flex justify-between text-[9px] font-mono text-slate-400">
+            <span>-24h Replay</span>
+            <span className="font-bold text-slate-700">0h (Now)</span>
+            <span>+24h</span>
+            <span>+48h Surge</span>
+            <span>+72h Forecast</span>
+          </div>
+        </div>
       </div>
     </div>
   );

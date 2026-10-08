@@ -49,7 +49,7 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor, active
       </div>
 
       {/* Horizontal Apple Cards Strip */}
-      <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
+      <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2 px-1">
         {filteredVessels.map(v => (
           <button
             key={v.id}
@@ -58,7 +58,7 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor, active
               setSelectedVesselId(v.id);
               if (onSelectAsset) onSelectAsset({ ...v, assetType: 'vessel' });
             }}
-            className={`apple-card p-3.5 text-left transition-all shrink-0 min-w-[175px] cursor-pointer ${
+            className={`apple-card p-3.5 text-left transition-all shrink-0 min-w-[195px] max-w-[240px] cursor-pointer ${
               selectedVesselId === v.id
                 ? 'border-[#0071E3] shadow-md ring-2 ring-[#0071E3]/20'
                 : 'hover:border-black/20'
@@ -72,7 +72,7 @@ export function VesselIntelligenceView({ onSelectAsset, onSelectCorridor, active
                 {v.status === 'delayed' ? 'Delay' : 'On Track'}
               </span>
             </div>
-            <div className="font-bold text-[#1D1D1F] text-xs truncate">{v.name}</div>
+            <div className="font-bold text-[#1D1D1F] text-xs leading-normal whitespace-nowrap overflow-hidden text-ellipsis" title={v.name}>{v.name}</div>
             <div className="text-[11px] text-[#86868B] mt-0.5">{v.speed} • {v.cog}</div>
           </button>
         ))}

@@ -62,6 +62,30 @@ export const ANCHORAGE_ZONES = [
 ];
 
 export const CORRIDOR_POLYLINES = {
+  // Singapore to Krishnapatnam Dynamic Diversion Sea Trunk
+  sea_singapore_kpct: [
+    [5.80, 95.20],   // Great Channel (Nicobar)
+    [9.10, 91.50],   // Central Andaman Sea
+    [12.40, 88.20],  // Bay of Bengal South
+    [15.10, 85.80],  // Bay of Bengal Mid
+    [16.9200, 84.1500], // MV Eastern Pearl current AIS position
+    [15.4000, 81.6000], // Diversion Waypoint Alpha
+    [14.4500, 80.3500], // Krishnapatnam Fairway Buoy
+    [14.2500, 80.1200]  // KPCT Berth 02
+  ],
+  // Krishnapatnam Port to Hyderabad Fast-Track Inland Corridor (NH-16 / NH-765)
+  land_kpct_hyderabad: [
+    [14.2500, 80.1200], // KPCT Greenfield Terminal Gates
+    [14.4426, 79.9865], // Nellore Bypass
+    [15.0200, 80.0100], // Singarayakonda
+    [15.5057, 80.0499], // Ongole Expressway Hub
+    [16.1500, 79.8000], // Vinukonda Junction
+    [16.8722, 79.5637], // Miryalaguda
+    [17.0575, 79.2684], // Nalgonda
+    [17.3100, 78.7500], // Hayathnagar (Outer Ring Road)
+    [17.3850, 78.4867]  // Hyderabad Genome Valley WH-01
+  ],
+
   // Global East-West Deepwater Shipping Trunk (Malacca Strait -> Dondra Head Sri Lanka -> Suez)
   sea_trunk_malacca_srilanka: [
     [5.80, 95.20],   // Great Channel (Nicobar)
@@ -638,8 +662,8 @@ export const FLEET_TRUCKS = [
     status: "AVAILABLE_EMPTY",
     statusLabel: "AVAILABLE (EMPTY)",
     badgeColor: "amber",
-    lat: 17.6300,
-    lng: 83.1500,
+    lat: 17.6150,
+    lng: 83.1350,
     currentLocation: "Gajuwaka Logistics Yard (Vizag Port Area)",
     assignedCorridor: "Vizag → Hyderabad Corridor (NH-65)",
     emptySinceHours: 4.5,

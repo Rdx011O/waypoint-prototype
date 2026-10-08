@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
 import { KpiStrip } from './components/KpiStrip';
@@ -17,6 +17,9 @@ import { CargoOwnerView } from './components/CargoOwnerView';
 import { ContextPanel } from './components/ContextPanel';
 import { RoleWorkspaceModal } from './components/RoleWorkspaceModal';
 import { GuideModal } from './components/GuideModal';
+import { CommandPalette } from './components/CommandPalette';
+import { ScenarioSandboxModal } from './components/ScenarioSandboxModal';
+import { ExecutiveBriefingModal } from './components/ExecutiveBriefingModal';
 import { ToastProvider, useToast } from './components/ToastNotification';
 import { PORTS, VESSELS, FLEET_TRUCKS, WAREHOUSES, ALERTS, CARGO_OWNER_SHIPMENTS } from './data/mockData';
 import { 
@@ -34,8 +37,10 @@ import {
   Activity,
   HelpCircle,
   Sparkles,
-  Info
+  Info,
+  FileText
 } from 'lucide-react';
+import { playIosChime } from './components/DynamicIslandHabitBar';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -44,9 +49,25 @@ function AppContent() {
   const [isContextPanelOpen, setIsContextPanelOpen] = useState(true);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isSandboxModalOpen, setIsSandboxModalOpen] = useState(false);
+  const [isBriefingModalOpen, setIsBriefingModalOpen] = useState(false);
   const [activeMetric, setActiveMetric] = useState('congestion');
   const [highlightedCorridor, setHighlightedCorridor] = useState('CORRIDOR-VIZAG-HYD');
+  const [activeReroute, setActiveReroute] = useState(null);
   const { addToast } = useToast();
+
+  // Global Keyboard Shortcuts (Cmd+K / Ctrl+K, /, Esc)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   const handleSelectAsset = (asset) => {
     setSelectedAsset(asset);
@@ -118,6 +139,27 @@ function AppContent() {
     else setActiveTab('overview');
   };
 
+  const handleRerouteExecuted = (portCode) => {
+    setActiveReroute(portCode);
+    if (portCode === 'KPCT') {
+      setHighlightedCorridor('CORRIDOR-KPCT-HYD');
+      addToast({
+        type: 'success',
+        title: 'Corridor Dynamic Shift',
+        message: 'Alternative corridor KPCT ➔ Hyderabad activated. Inland transit reduced by 170 km.'
+      });
+    } else if (portCode === 'VIZAG') {
+      setHighlightedCorridor('CORRIDOR-VIZAG-HYD');
+      addToast({
+        type: 'info',
+        title: 'Anchorage Hold Protocol',
+        message: 'MV Eastern Pearl queued at Vizag Outer Roads Berth 04.'
+      });
+    } else {
+      setHighlightedCorridor('CORRIDOR-VIZAG-HYD');
+    }
+  };
+
   // Dynamic alert count by role
   const getAlertCountByRole = () => {
     if (activeRole === 'cargo_owner') return 2;
@@ -171,6 +213,9 @@ function AppContent() {
         onOpenAlerts={() => setActiveTab('alerts')}
         onOpenRoleModal={() => setIsRoleModalOpen(true)}
         onOpenGuideModal={() => setIsGuideModalOpen(true)}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenSandbox={() => setIsSandboxModalOpen(true)}
+        onOpenBriefing={() => setIsBriefingModalOpen(true)}
         onSelectTab={(tab) => setActiveTab(tab)}
       />
 
@@ -235,6 +280,24 @@ function AppContent() {
 
                   <div className="flex items-center gap-2">
                     <button
+                      onClick={() => setIsSandboxModalOpen(true)}
+                      className="hidden sm:flex px-3 py-1.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-[#5856D6] border border-indigo-200 text-[11px] font-bold transition-all items-center gap-1.5 cursor-pointer shadow-2xs"
+                      title="Simulate Port Congestion Diversion"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>What-If Sandbox</span>
+                    </button>
+
+                    <button
+                      onClick={() => setIsBriefingModalOpen(true)}
+                      className="hidden sm:flex px-3 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100 text-[#0071E3] border border-blue-200 text-[11px] font-bold transition-all items-center gap-1.5 cursor-pointer shadow-2xs"
+                      title="Corridor Operations Briefing Report"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Briefing</span>
+                    </button>
+
+                    <button
                       onClick={() => setIsContextPanelOpen(!isContextPanelOpen)}
                       className={`px-3 py-1.5 rounded-full border text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ios-btn ${
                         isContextPanelOpen 
@@ -260,16 +323,19 @@ function AppContent() {
                     selectedAsset={selectedAsset}
                     onSelectAsset={handleSelectAsset}
                     highlightedCorridor={highlightedCorridor}
+                    activeReroute={activeReroute}
                     activeRole={activeRole}
                   />
 
                   {/* Sleek Floating Corridor Node Bar (Bottom of Map) */}
-                  <div className="absolute bottom-9 left-1/2 -translate-x-1/2 z-[400] w-[95%] max-w-4xl ios-glass-dark rounded-3xl p-3 shadow-2xl border border-white/20 text-white hidden md:block animate-in fade-in slide-in-from-bottom-3 duration-300">
+                  <div className="absolute bottom-16 sm:bottom-18 left-1/2 -translate-x-1/2 z-[400] w-[95%] max-w-4xl ios-glass-dark rounded-3xl p-3 shadow-2xl border border-white/20 text-white hidden md:block animate-in fade-in slide-in-from-bottom-3 duration-300">
                     <div className="flex items-center justify-between pb-2 border-b border-white/10 text-[10px] text-slate-300">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-[#007AFF] animate-pulse"></span>
                         <span className="font-extrabold uppercase tracking-wider text-white">
-                          SYNCHRONIZED PIPELINE (VIZAG ➔ HYDERABAD)
+                          {activeReroute === 'KPCT' 
+                            ? '⚡ SYNCHRONIZED PIPELINE (KPCT ➔ HYDERABAD - ACTIVE DIVERSION)' 
+                            : 'SYNCHRONIZED PIPELINE (VIZAG ➔ HYDERABAD)'}
                         </span>
                       </div>
                       <span className="font-medium text-slate-400">TAP ANY NODE TO INSPECT TELEMETRY</span>
@@ -425,10 +491,36 @@ function AppContent() {
               onClose={() => setIsContextPanelOpen(false)}
               onTriggerImpactView={handleTriggerImpactView}
               onJumpToTab={(tab) => setActiveTab(tab)}
+              onOpenSandbox={() => setIsSandboxModalOpen(true)}
             />
           )}
         </main>
       </div>
+
+      {/* Universal Command Palette (⌘K / Ctrl+K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSelectAsset={handleSelectAsset}
+        onSelectTab={(tab) => setActiveTab(tab)}
+        onOpenSandbox={() => setIsSandboxModalOpen(true)}
+        onOpenBriefing={() => setIsBriefingModalOpen(true)}
+        onOpenRoleModal={() => setIsRoleModalOpen(true)}
+      />
+
+      {/* Strategic What-If Sandbox Modal */}
+      <ScenarioSandboxModal
+        isOpen={isSandboxModalOpen}
+        onClose={() => setIsSandboxModalOpen(false)}
+        onRerouteExecuted={handleRerouteExecuted}
+        activeReroute={activeReroute}
+      />
+
+      {/* Executive Operations Briefing Modal */}
+      <ExecutiveBriefingModal
+        isOpen={isBriefingModalOpen}
+        onClose={() => setIsBriefingModalOpen(false)}
+      />
 
       {/* Role Workspace Modal */}
       <RoleWorkspaceModal

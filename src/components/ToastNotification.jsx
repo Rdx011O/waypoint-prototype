@@ -33,7 +33,7 @@ export function ToastProvider({ children }) {
     <ToastContext.Provider value={{ addToast, removeToast }}>
       {children}
       {/* Toast Render Portal */}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-3 font-mono">
+      <div className="fixed bottom-4 right-4 z-[3000] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-3 font-mono">
         {toasts.map((t) => {
           const isSuccess = t.type === 'success';
           const isWarning = t.type === 'warning';

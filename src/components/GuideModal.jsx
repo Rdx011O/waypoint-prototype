@@ -39,7 +39,7 @@ export function GuideModal({ isOpen, onClose }) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[2000] bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
       <div className="bg-white/95 backdrop-blur-2xl border border-black/10 rounded-[28px] max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* iOS Modal Header */}
         <div className="p-5 pb-4 border-b border-black/[0.05] flex items-center justify-between">
